@@ -10,17 +10,19 @@
 
   <style>
     /* ============================================================
-       СЕКЦИЯ 2: ДИЗАЙН (розовая нежная тема)
+       СЕКЦИЯ 2: ДИЗАЙН (космический градиент)
        ============================================================ */
     :root {
-      --pink: #EFC6C8;        /* пыльная роза */
-      --marshmallow: #F7E6E0; /* кремово-розовый */
-      --peach: #EBC49D;       /* тёплая карамель */
-      --accent: #C06579;      /* приглушённая роза-терракота */
-      --dark: #4A3037;        /* тёплый тёмно-коричневый */
-      --card: rgba(255, 250, 247, 0.72);
-      --shadow: 0 8px 24px rgba(192, 100, 122, 0.16);
+      --pink: #9d54b3;        /* туманность / неоново-фиолетовый */
+      --marshmallow: #2e1b56; /* глубокий космический фиолет */
+      --peach: #e0559c;       /* неоново-маджента */
+      --accent: #ff6bb3;      /* космический розовый */
+      --accent2: #8f6bff;     /* неоновый фиолет */
+      --dark: #f1e8ff;        /* светлый текст на тёмном фоне */
+      --card: rgba(26, 14, 48, 0.5);
+      --shadow: 0 8px 26px rgba(130, 70, 220, 0.28);
       --radius: 20px;
+      --glass: rgba(30, 17, 58, 0.5);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -34,7 +36,7 @@
     }
 
     body {
-      background: linear-gradient(165deg, #FCF6F2 0%, #F2D3C9 38%, #E9C29B 100%);
+      background: linear-gradient(160deg, #0f0c2a 0%, #2b1a4d 45%, #6a256e 100%);
       position: relative;
     }
 
@@ -49,7 +51,7 @@
     .hearts-bg span {
       position: absolute;
       bottom: -8vh;
-      color: rgba(180, 105, 120, 0.18);
+      color: rgba(165, 85, 220, 0.35);
       font-size: 22px;
       animation: floatUp linear infinite;
       will-change: transform, opacity;
@@ -87,9 +89,9 @@
       font-size: 17px;
       font-weight: bold;
       color: var(--dark);
-      background: rgba(255, 255, 255, 0.55);
+      background: rgba(18, 10, 36, 0.72);
       backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(160, 95, 115, 0.14);
+      border-bottom: 1px solid rgba(165, 85, 220, 0.25);
       letter-spacing: 0.3px;
       flex-shrink: 0;
     }
@@ -131,7 +133,7 @@
 
     h1 { font-size: 26px; text-align: center; margin: 8px 0 6px; }
     h2 { font-size: 19px; text-align: center; margin-bottom: 10px; color: var(--accent); }
-    .subtitle { text-align: center; color: #8a5a6d; font-size: 14px; margin-bottom: 16px; }
+    .subtitle { text-align: center; color: #b8a6d6; font-size: 14px; margin-bottom: 16px; }
 
     /* Счётчики-карточки */
     .counters { display: flex; gap: 12px; margin-bottom: 14px; }
@@ -143,7 +145,7 @@
       text-align: center;
       animation: fadeUp 0.5s ease both;
     }
-    .counter-card.big { flex: 1.6; background: linear-gradient(135deg, #FFFFFF, var(--marshmallow)); }
+    .counter-card.big { flex: 1.6; background: linear-gradient(135deg, #3a2460, var(--marshmallow)); }
     .counter-card.small { flex: 1; }
     .counter-num {
       font-size: 40px;
@@ -153,8 +155,8 @@
       margin: 6px 0;
     }
     .counter-card.small .counter-num { font-size: 28px; }
-    .counter-label { font-size: 13px; color: #8a5a6d; }
-    .counter-dayword { font-size: 12px; color: #b07a8f; }
+    .counter-label { font-size: 13px; color: #b8a6d6; }
+    .counter-dayword { font-size: 12px; color: #9d8ac7; }
 
     /* Хронология любви */
     .timeline {
@@ -186,17 +188,19 @@
     .tl-line::after { bottom: -3px; }
     .tl-marker {
       position: absolute;
-      left: 24px;
-      top: 14px;
-      font-size: 19px;
+      left: 50%;
+      top: 0%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+      line-height: 1;
       animation: markerY 6s ease-in-out infinite;
-      filter: drop-shadow(0 2px 4px rgba(192,100,122,0.6));
+      filter: drop-shadow(0 0 6px rgba(255, 107, 179, 0.8));
       z-index: 2;
     }
     @keyframes markerY {
-      0%   { top: 14px; }
-      50%  { top: calc(100% - 38px); }
-      100% { top: 14px; }
+      0%   { top: 0%; }
+      50%  { top: 100%; }
+      100% { top: 0%; }
     }
     .tl-points { display: flex; flex-direction: column; gap: 9px; }
     .tl-point {
@@ -205,8 +209,8 @@
       padding: 10px 14px 10px 62px;
       min-height: 60px;
       border-radius: 16px;
-      background: rgba(255,255,255,0.65);
-      box-shadow: 0 4px 12px rgba(192,100,122,0.12);
+      background: rgba(30, 17, 58, 0.42);
+      box-shadow: 0 4px 12px rgba(46, 27, 86, 0.35);
       cursor: pointer;
       animation: fadeUp 0.5s ease both;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -220,9 +224,9 @@
       width: 44px; height: 44px;
       display: flex; align-items: center; justify-content: center;
       font-size: 24px;
-      background: #fff;
+      background: #241442;
       border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(192,100,122,0.28);
+      box-shadow: 0 4px 14px rgba(143, 107, 255, 0.5);
       z-index: 2;
       transition: box-shadow 0.3s ease;
     }
@@ -230,19 +234,19 @@
       animation: bloom 1s ease;
     }
     @keyframes bloom {
-      0%   { transform: translateY(-50%) scale(1); box-shadow: 0 0 0 rgba(192,100,122,0); }
-      40%  { transform: translateY(-50%) scale(1.5); box-shadow: 0 0 30px rgba(192,100,122,0.9); }
-      100% { transform: translateY(-50%) scale(1); box-shadow: 0 0 12px rgba(192,100,122,0.5); }
+      0%   { transform: translateY(-50%) scale(1); box-shadow: 0 0 0 rgba(165,85,220,0); }
+      40%  { transform: translateY(-50%) scale(1.5); box-shadow: 0 0 30px rgba(165,85,220,0.9); }
+      100% { transform: translateY(-50%) scale(1); box-shadow: 0 0 12px rgba(165,85,220,0.5); }
     }
     .tl-txt { flex: 1; }
     .tl-label { font-weight: bold; font-size: 15px; }
-    .tl-sub { font-size: 12.5px; color: #8a5a6d; }
+    .tl-sub { font-size: 12.5px; color: #b8a6d6; }
     .tl-gap {
       align-self: center;
       font-size: 12px;
-      color: #9a6b7e;
-      background: rgba(255,255,255,0.65);
-      border: 1px dashed rgba(192,100,122,0.4);
+      color: #c9b8ec;
+      background: rgba(30, 17, 58, 0.35);
+      border: 1px dashed rgba(165, 85, 220, 0.45);
       padding: 5px 14px;
       border-radius: 20px;
       text-align: center;
@@ -251,10 +255,10 @@
       align-self: center;
       font-size: 12px;
       color: #fff;
-      background: linear-gradient(90deg, var(--accent), #D68874);
+      background: linear-gradient(90deg, var(--accent), #8f6bff);
       padding: 6px 16px;
       border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(192,100,122,0.3);
+      box-shadow: 0 4px 12px rgba(165,85,220,0.3);
       text-align: center;
       animation: popIn 0.6s ease both;
     }
@@ -262,7 +266,7 @@
     /* Кнопки */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-      background: linear-gradient(135deg, var(--accent), #D68874);
+      background: linear-gradient(135deg, var(--accent), #8f6bff);
       color: #fff;
       border: none;
       border-radius: 18px;
@@ -270,16 +274,16 @@
       font-size: 15px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 6px 16px rgba(192,100,122,0.35);
+      box-shadow: 0 6px 16px rgba(165,85,220,0.35);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
       font-family: inherit;
     }
     .btn:active { transform: scale(0.95); }
     .btn.ghost {
-      background: #fff;
-      color: var(--accent);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-      border: 1.5px solid var(--pink);
+      background: rgba(255, 255, 255, 0.08);
+      color: #f1e8ff;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+      border: 1.5px solid rgba(165, 85, 220, 0.45);
     }
     .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .tiles .btn { padding: 16px 12px; flex-direction: column; font-size: 14px; }
@@ -291,11 +295,12 @@
       left: 50%;
       bottom: 100px;
       transform: translateX(-50%);
-      background: #fff;
+      background: #241547;
       color: var(--dark);
       padding: 12px 18px;
       border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(192,100,122,0.3);
+      box-shadow: 0 8px 24px rgba(165,85,220,0.4);
+      border: 1px solid rgba(165, 85, 220, 0.3);
       font-size: 14px;
       z-index: 50;
       animation: toastIn 0.25s ease both;
@@ -314,9 +319,9 @@
       width: 100%;
       max-width: 560px;
       display: flex;
-      background: rgba(255,255,255,0.85);
+      background: rgba(16, 9, 32, 0.88);
       backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(192,100,122,0.18);
+      border-top: 1px solid rgba(165,85,220,0.25);
       padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
       z-index: 5;
     }
@@ -325,20 +330,20 @@
       display: flex; flex-direction: column; align-items: center; gap: 2px;
       padding: 8px 2px;
       font-size: 11px;
-      color: #b07a8f;
+      color: #9d8ac7;
       cursor: pointer;
       border-radius: 14px;
       transition: color 0.2s, background 0.2s, transform 0.15s;
     }
     .tab .ico { font-size: 22px; line-height: 1; }
-    .tab.active { color: var(--accent); background: rgba(255,209,220,0.5); }
+    .tab.active { color: var(--accent); background: rgba(165, 85, 220, 0.22); }
     .tab:active { transform: scale(0.92); }
 
     /* Вспышка фона при поцелуе */
     .flash .app::before, body.flash::after {
       content: '';
       position: fixed; inset: 0;
-      background: radial-gradient(circle, rgba(192,100,122,0.45), transparent 70%);
+      background: radial-gradient(circle, rgba(165,85,220,0.45), transparent 70%);
       pointer-events: none;
       z-index: 0;
     }
@@ -369,13 +374,13 @@
       50%     { transform: scale(1.35); }
     }
     .kiss-count { font-size: 20px; font-weight: bold; color: var(--accent); margin: 10px 0 4px; }
-    .kiss-hint { color: #8a5a6d; font-size: 14px; margin-bottom: 18px; }
+    .kiss-hint { color: #b8a6d6; font-size: 14px; margin-bottom: 18px; }
     .kiss-msg {
       display: inline-block;
       margin-top: 14px;
       font-size: 17px;
       color: var(--dark);
-      background: #fff;
+      background: rgba(36, 20, 71, 0.9);
       padding: 10px 20px;
       border-radius: 18px;
       box-shadow: var(--shadow);
@@ -389,16 +394,16 @@
     .photo-card {
       border-radius: 16px;
       overflow: hidden;
-      background: #fff;
+      background: rgba(30, 17, 58, 0.5);
       box-shadow: var(--shadow);
       cursor: pointer;
       animation: fadeUp 0.4s ease both;
     }
     .photo-card img { width: 100%; height: 150px; object-fit: cover; display: block; }
-    .photo-card .cap { padding: 8px 10px; font-size: 12px; color: #8a5a6d; }
+    .photo-card .cap { padding: 8px 10px; font-size: 12px; color: #b8a6d6; }
     .photo-day {
       display: flex; align-items: center; gap: 12px;
-      background: linear-gradient(135deg, #fff, var(--peach));
+      background: linear-gradient(135deg, #3a2460, var(--peach));
       border-radius: var(--radius);
       padding: 12px;
       margin-bottom: 14px;
@@ -407,17 +412,17 @@
     .photo-day img { width: 80px; height: 80px; border-radius: 14px; object-fit: cover; }
     .photo-day .pd-txt { flex: 1; }
     .photo-day .pd-title { font-weight: bold; font-size: 14px; }
-    .photo-day .pd-timer { font-size: 12px; color: #b07a8f; }
+    .photo-day .pd-timer { font-size: 12px; color: #9d8ac7; }
     .loader {
       text-align: center; padding: 30px 0;
     }
     .loader .heart { font-size: 44px; display: inline-block; animation: heartBeat 1s ease infinite; }
-    .empty-note { text-align: center; color: #8a5a6d; padding: 30px 16px; font-size: 14px; }
+    .empty-note { text-align: center; color: #b8a6d6; padding: 30px 16px; font-size: 14px; }
 
     /* Полноэкранный просмотр фото */
     .photo-viewer {
       position: fixed; inset: 0;
-      background: rgba(40, 18, 28, 0.9);
+      background: rgba(8, 4, 22, 0.94);
       z-index: 40;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: 20px;
@@ -445,12 +450,12 @@
     .game-ico { font-size: 34px; }
     .game-info { flex: 1; }
     .game-name { font-weight: bold; font-size: 15px; }
-    .game-desc { font-size: 12px; color: #8a5a6d; }
+    .game-desc { font-size: 12px; color: #b8a6d6; }
     .game-best { font-size: 12px; color: var(--accent); }
 
     .game-layer {
       position: fixed; inset: 0;
-      background: linear-gradient(165deg, #FCF6F2, #F2D3C9);
+      background: linear-gradient(160deg, #120b28 0%, #2b1a4d 60%, #5a256b 100%);
       z-index: 30;
       display: flex; flex-direction: column;
       padding: 12px;
@@ -463,20 +468,20 @@
     .game-layer .gl-title { font-weight: bold; font-size: 17px; }
     .game-layer .gl-score { color: var(--accent); font-weight: bold; }
     canvas.dino-canvas {
-      background: #fff;
+      background: rgba(30, 17, 58, 0.55);
       border-radius: 16px;
       box-shadow: var(--shadow);
       width: 100%;
       touch-action: manipulation;
     }
-    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 8px; background: #fff; border-radius: 16px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 8px; background: rgba(30, 17, 58, 0.55); border-radius: 16px; }
     .cell { aspect-ratio: 1; border-radius: 10px; background: var(--marshmallow); display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: transform 0.15s, background 0.2s; }
     .cell.filled { background: linear-gradient(135deg, var(--pink), var(--accent)); }
     .cell.burn { animation: burn 0.5s ease both; }
     @keyframes burn { 0% { transform: scale(1); opacity: 1;} 50% { transform: scale(1.25); opacity: 0.6;} 100% { transform: scale(0); opacity: 0;} }
     .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .mem-card { aspect-ratio: 1; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #D68874); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; transition: transform 0.25s; perspective: 400px; }
-    .mem-card.matched { background: #fff; box-shadow: 0 0 0 2px var(--pink) inset; }
+    .mem-card { aspect-ratio: 1; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #8f6bff); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; transition: transform 0.25s; perspective: 400px; }
+    .mem-card.matched { background: #352259; box-shadow: 0 0 0 2px var(--accent) inset; }
     .clicker-btn {
       font-size: 120px; display: inline-block; cursor: pointer; -webkit-user-select: none; user-select: none;
       animation: heartBeat 1s ease infinite;
@@ -486,14 +491,15 @@
     /* Модалка */
     .modal-bg {
       position: fixed; inset: 0;
-      background: rgba(40,18,28,0.5);
+      background: rgba(6, 3, 18, 0.62);
       z-index: 45;
       display: flex; align-items: center; justify-content: center;
       padding: 20px;
       animation: fadeUp 0.25s ease both;
     }
     .modal {
-      background: #fff;
+      background: #241647;
+      border: 1px solid rgba(165, 85, 220, 0.35);
       border-radius: 22px;
       padding: 24px;
       max-width: 340px;
@@ -510,18 +516,18 @@
     .quest-q { font-size: 19px; font-weight: bold; margin: 4px 0 16px; }
     .quest-opt {
       display: block; width: 100%;
-      background: #fff; border: 2px solid var(--pink);
+      background: rgba(30, 17, 58, 0.45); border: 2px solid rgba(165, 85, 220, 0.4);
       border-radius: 16px; padding: 13px; margin-bottom: 10px;
       font-size: 15px; cursor: pointer; font-family: inherit; color: var(--dark);
       transition: transform 0.15s, border-color 0.15s;
     }
     .quest-opt:active { transform: scale(0.97); }
-    .quest-opt.correct { border-color: #7ed957; background: #efffe6; }
-    .quest-opt.wrong { border-color: #ff8787; background: #fff0f0; }
-    .quest-progress { color: #b07a8f; font-size: 13px; margin-bottom: 8px; }
+    .quest-opt.correct { border-color: #7ed957; background: #203a30; }
+    .quest-opt.wrong { border-color: #ff8787; background: #3a2030; }
+    .quest-progress { color: #9d8ac7; font-size: 13px; margin-bottom: 8px; }
     .msg-frame {
-      background: linear-gradient(135deg, #fff, var(--marshmallow));
-      border: 2px solid var(--pink);
+      background: linear-gradient(135deg, #3a2460, var(--marshmallow));
+      border: 2px solid rgba(165, 85, 220, 0.5);
       border-radius: 20px;
       padding: 20px;
       font-size: 15px;
@@ -545,11 +551,11 @@
       }
       .tl-line::before { left: -3px; top: 50%; }
       .tl-line::after { left: auto; right: -3px; top: 50%; }
-      .tl-marker { top: 23px; left: 24px; animation: markerX 7s ease-in-out infinite; }
+      .tl-marker { top: 50%; left: 0%; transform: translate(-50%, -50%); animation: markerX 7s ease-in-out infinite; }
       @keyframes markerX {
-        0%   { left: 24px; }
-        50%  { left: calc(100% - 24px); }
-        100% { left: 24px; }
+        0%   { left: 0%; }
+        50%  { left: 100%; }
+        100% { left: 0%; }
       }
       .tl-points { flex-direction: row; flex-wrap: wrap; }
       .tl-point {
@@ -596,8 +602,7 @@
         <div class="card" style="margin-bottom: 8px;">
           <h2>⭐ Хронология любви</h2>
           <div class="timeline" id="timeline">
-            <div class="tl-line"></div>
-            <div class="tl-marker">💖</div>
+            <div class="tl-line"><span class="tl-marker">💖</span></div>
             <div class="tl-points">
               <div class="tl-point" data-type="meet">
                 <div class="tl-dot">🌸</div>
@@ -771,8 +776,8 @@
     if (tg) {
       tg.ready();
       tg.expand();
-      try { tg.setHeaderColor('#F2D3C9'); } catch (e) {}
-      try { tg.setBackgroundColor('#FCF6F2'); } catch (e) {}
+      try { tg.setHeaderColor('#1a1030'); } catch (e) {}
+      try { tg.setBackgroundColor('#0f0c2a'); } catch (e) {}
     }
 
     /* ============================================================
@@ -1273,7 +1278,7 @@
       endEl.innerHTML =
         '<h2 style="margin-bottom:8px;">' + (isNew ? '🏆 Новый рекорд!' : '💖') + '</h2>' +
         '<p style="font-size:18px;margin-bottom:6px;">Твой результат: <b>' + score + '</b></p>' +
-        '<p style="font-size:13px;color:#8a5a6d;margin-bottom:16px;">Рекорд: ' + best + '</p>' +
+        '<p style="font-size:13px;color:#b8a6d6;margin-bottom:16px;">Рекорд: ' + best + '</p>' +
         '<div class="tiles"><button class="btn" id="btnAgain">🔁 Ещё раз</button><button class="btn ghost" id="btnToGames">⬅️ К играм</button></div>';
       $('#btnAgain').addEventListener('click', () => openGame(bestKey));
       $('#btnToGames').addEventListener('click', () => { closeGame(); switchTab('games'); });
@@ -1319,7 +1324,7 @@
         ctx.clearRect(0, 0, W, canvas.height);
 
         // земля
-        ctx.fillStyle = '#ffd6e6';
+        ctx.fillStyle = '#8f6bff';
         ctx.fillRect(0, groundY, W, 4);
 
         // динозавр
@@ -1477,7 +1482,7 @@
     function startClicker() {
       const body = $('#gameBody');
       body.innerHTML = '<div style="text-align:center;"><div class="clicker-btn" id="clickBtn">💖</div>' +
-        '<p style="font-size:18px;color:#8a5a6d;margin:8px 0;" id="clickLeft">Осталось: 30 сек</p></div>';
+        '<p style="font-size:18px;color:#b8a6d6;margin:8px 0;" id="clickLeft">Осталось: 30 сек</p></div>';
       const btn = $('#clickBtn');
       let clicks = 0, timeLeft = 30;
       btn.addEventListener('click', () => {
@@ -1504,7 +1509,7 @@
        ============================================================ */
     function initHearts() {
       const bg = $('#heartsBg');
-      const emos = ['❤️', '💖', '💕', '💗', '🌸', '💘'];
+      const emos = ['❤️', '💖', '✨', '⭐', '💫', '🌟', '💜'];
       for (let i = 0; i < 16; i++) {
         const s = document.createElement('span');
         s.textContent = emos[Math.floor(Math.random() * emos.length)];
