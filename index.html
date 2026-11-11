@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Наши 6 месяцев ❤️</title>
+
+  <!-- СЕКЦИЯ 1: Официальный SDK Telegram WebApp -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    /* ============================================================
+       СЕКЦИЯ 2: ДИЗАЙН (розовая нежная тема)
+       ============================================================ */
+    :root {
+      --pink: #FFD1DC;        /* пудровый */
+      --marshmallow: #FFE4EC; /* зефирный */
+      --peach: #FFDAB9;       /* персиковый */
+      --accent: #FF6B9D;      /* акцент */
+      --dark: #4A2A3A;        /* тёмный текст */
+      --card: rgba(255, 255, 255, 0.75);
+      --shadow: 0 8px 24px rgba(255, 107, 157, 0.18);
+      --radius: 20px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Comic Sans MS', 'Segoe UI', system-ui, sans-serif;
+      color: var(--dark);
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      background: linear-gradient(160deg, #FFF0F5 0%, var(--pink) 40%, var(--peach) 100%);
+      position: relative;
+    }
+
+    /* Летающие сердечки на заднем плане */
+    .hearts-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .hearts-bg span {
+      position: absolute;
+      bottom: -8vh;
+      color: rgba(255, 107, 157, 0.22);
+      font-size: 22px;
+      animation: floatUp linear infinite;
+      will-change: transform, opacity;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(0deg) scale(0.7); opacity: 0; }
+      15%  { opacity: 0.5; }
+      50%  { transform: translateY(-55vh) rotate(20deg) scale(1); }
+      100% { transform: translateY(-115vh) rotate(-15deg) scale(0.9); opacity: 0; }
+    }
+
+    /* Частицы (эталонный сниппет из СЕКЦИИ 4.5) */
+    .particle {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+      z-index: 10;
+      will-change: transform, opacity;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    /* Верхняя панель */
+    .topbar {
+      padding: 14px 18px;
+      text-align: center;
+      font-size: 17px;
+      font-weight: bold;
+      color: var(--dark);
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 107, 157, 0.15);
+      letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+
+    /* Контент */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 14px 90px;
+      position: relative;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .panel { display: none; }
+    .panel.active {
+      display: block;
+      animation: fadeUp 0.4s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+      0%   { opacity: 0; transform: scale(0.8); }
+      60%  { transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* Карточки */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin-bottom: 14px;
+      backdrop-filter: blur(6px);
+      animation: fadeUp 0.5s ease both;
+    }
+
+    h1 { font-size: 26px; text-align: center; margin: 8px 0 6px; }
+    h2 { font-size: 19px; text-align: center; margin-bottom: 10px; color: var(--accent); }
+    .subtitle { text-align: center; color: #8a5a6d; font-size: 14px; margin-bottom: 16px; }
+
+    /* Счётчики-карточки */
+    .counters { display: flex; gap: 12px; margin-bottom: 14px; }
+    .counter-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      text-align: center;
+      animation: fadeUp 0.5s ease both;
+    }
+    .counter-card.big { flex: 1.6; background: linear-gradient(135deg, #FFFFFF, var(--marshmallow)); }
+    .counter-card.small { flex: 1; }
+    .counter-num {
+      font-size: 40px;
+      font-weight: bold;
+      color: var(--accent);
+      line-height: 1;
+      margin: 6px 0;
+    }
+    .counter-card.small .counter-num { font-size: 28px; }
+    .counter-label { font-size: 13px; color: #8a5a6d; }
+    .counter-dayword { font-size: 12px; color: #b07a8f; }
+
+    /* Хронология любви */
+    .timeline {
+      position: relative;
+      padding: 10px 0 14px;
+    }
+    .tl-line {
+      position: absolute;
+      background: linear-gradient(90deg, var(--pink), var(--accent));
+      border-radius: 20px;
+      height: 6px;
+    }
+    .tl-marker {
+      position: absolute;
+      font-size: 22px;
+      animation: markerX 6s ease-in-out infinite;
+      filter: drop-shadow(0 2px 4px rgba(255,107,157,0.6));
+      z-index: 2;
+    }
+    @keyframes markerX {
+      0%   { left: 0%; }
+      50%  { left: 100%; }
+      100% { left: 0%; }
+    }
+    .tl-points { display: flex; flex-direction: column; gap: 4px; }
+    .tl-point {
+      display: flex; align-items: center; gap: 12px;
+      padding: 8px 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.5);
+      cursor: pointer;
+      animation: fadeUp 0.5s ease both;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .tl-point:active { transform: scale(0.97); }
+    .tl-dot {
+      width: 46px; height: 46px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(255,107,157,0.25);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .tl-point.blooming .tl-dot {
+      animation: bloom 1s ease;
+    }
+    @keyframes bloom {
+      0%   { transform: scale(1); box-shadow: 0 0 0 rgba(255,107,157,0); }
+      40%  { transform: scale(1.6); box-shadow: 0 0 30px rgba(255,107,157,0.9); }
+      100% { transform: scale(1); box-shadow: 0 0 12px rgba(255,107,157,0.5); }
+    }
+    .tl-txt { flex: 1; }
+    .tl-label { font-weight: bold; font-size: 15px; }
+    .tl-sub { font-size: 12.5px; color: #8a5a6d; }
+    .tl-gap {
+      display: flex; align-items: center; gap: 6px;
+      padding: 2px 6px 2px 22px;
+      color: #b07a8f; font-size: 12px;
+    }
+    .tl-gap::before { content: '·'; color: var(--accent); }
+    .tl-badge {
+      display: inline-block;
+      margin: 4px 0 2px 22px;
+      font-size: 12px;
+      color: #fff;
+      background: linear-gradient(90deg, var(--accent), #ff8fb5);
+      padding: 4px 12px;
+      border-radius: 20px;
+      animation: popIn 0.6s ease both;
+    }
+
+    /* Кнопки */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: linear-gradient(135deg, var(--accent), #ff8fb5);
+      color: #fff;
+      border: none;
+      border-radius: 18px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(255,107,157,0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      font-family: inherit;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn.ghost {
+      background: #fff;
+      color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      border: 1.5px solid var(--pink);
+    }
+    .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .tiles .btn { padding: 16px 12px; flex-direction: column; font-size: 14px; }
+    .tiles .btn .big { font-size: 26px; }
+
+    /* Тост-подсказка */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 100px;
+      transform: translateX(-50%);
+      background: #fff;
+      color: var(--dark);
+      padding: 12px 18px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(255,107,157,0.3);
+      font-size: 14px;
+      z-index: 50;
+      animation: toastIn 0.25s ease both;
+      max-width: 88%;
+      text-align: center;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+    /* ============================================================
+       СЕКЦИЯ 3: Нижняя панель вкладок
+       ============================================================ */
+    .tabbar {
+      position: fixed;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255,107,157,0.18);
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+      z-index: 5;
+    }
+    .tab {
+      flex: 1;
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 8px 2px;
+      font-size: 11px;
+      color: #b07a8f;
+      cursor: pointer;
+      border-radius: 14px;
+      transition: color 0.2s, background 0.2s, transform 0.15s;
+    }
+    .tab .ico { font-size: 22px; line-height: 1; }
+    .tab.active { color: var(--accent); background: rgba(255,209,220,0.5); }
+    .tab:active { transform: scale(0.92); }
+
+    /* Вспышка фона при поцелуе */
+    .flash .app::before, body.flash::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(circle, rgba(255,107,157,0.45), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ============================================================
+       СЕКЦИЯ 6: Поцелуйчик
+       ============================================================ */
+    .kiss-wrap { text-align: center; padding-top: 10px; }
+    .kiss-heart {
+      font-size: 130px;
+      display: inline-block;
+      cursor: pointer;
+      -webkit-user-select: none; user-select: none;
+      animation: heartBeat 1.4s ease-in-out infinite;
+      transition: transform 0.1s ease;
+      line-height: 1;
+    }
+    @keyframes heartBeat {
+      0%,100% { transform: scale(1); }
+      14%     { transform: scale(1.12); }
+      28%     { transform: scale(1); }
+      42%     { transform: scale(1.12); }
+      70%     { transform: scale(1); }
+    }
+    .kiss-heart.super { animation: heartSuper 0.5s ease infinite; }
+    @keyframes heartSuper {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.35); }
+    }
+    .kiss-count { font-size: 20px; font-weight: bold; color: var(--accent); margin: 10px 0 4px; }
+    .kiss-hint { color: #8a5a6d; font-size: 14px; margin-bottom: 18px; }
+    .kiss-msg {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 17px;
+      color: var(--dark);
+      background: #fff;
+      padding: 10px 20px;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      animation: popIn 0.3s ease both;
+    }
+
+    /* ============================================================
+       СЕКЦИЯ 7: Галерея
+       ============================================================ */
+    .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .photo-card {
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      animation: fadeUp 0.4s ease both;
+    }
+    .photo-card img { width: 100%; height: 150px; object-fit: cover; display: block; }
+    .photo-card .cap { padding: 8px 10px; font-size: 12px; color: #8a5a6d; }
+    .photo-day {
+      display: flex; align-items: center; gap: 12px;
+      background: linear-gradient(135deg, #fff, var(--peach));
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .photo-day img { width: 80px; height: 80px; border-radius: 14px; object-fit: cover; }
+    .photo-day .pd-txt { flex: 1; }
+    .photo-day .pd-title { font-weight: bold; font-size: 14px; }
+    .photo-day .pd-timer { font-size: 12px; color: #b07a8f; }
+    .loader {
+      text-align: center; padding: 30px 0;
+    }
+    .loader .heart { font-size: 44px; display: inline-block; animation: heartBeat 1s ease infinite; }
+    .empty-note { text-align: center; color: #8a5a6d; padding: 30px 16px; font-size: 14px; }
+
+    /* Полноэкранный просмотр фото */
+    .photo-viewer {
+      position: fixed; inset: 0;
+      background: rgba(40, 18, 28, 0.9);
+      z-index: 40;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .photo-viewer img { max-width: 100%; max-height: 78vh; border-radius: 16px; }
+    .photo-viewer .cap { color: #fff; margin-top: 14px; font-size: 15px; text-align: center; }
+    .photo-viewer .close { margin-top: 16px; color: #fff; background: rgba(255,255,255,0.18); border: none; border-radius: 16px; padding: 10px 22px; font-size: 14px; cursor: pointer; font-family: inherit; }
+
+    .hidden { display: none !important; }
+
+    /* ============================================================
+       СЕКЦИЯ 8: Игры
+       ============================================================ */
+    .games-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .game-card {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .game-card:active { transform: scale(0.97); }
+    .game-ico { font-size: 34px; }
+    .game-info { flex: 1; }
+    .game-name { font-weight: bold; font-size: 15px; }
+    .game-desc { font-size: 12px; color: #8a5a6d; }
+    .game-best { font-size: 12px; color: var(--accent); }
+
+    .game-layer {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, #FFF0F5, var(--marshmallow));
+      z-index: 30;
+      display: flex; flex-direction: column;
+      padding: 12px;
+      overflow-y: auto;
+    }
+    .game-layer .gl-top {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .game-layer .gl-title { font-weight: bold; font-size: 17px; }
+    .game-layer .gl-score { color: var(--accent); font-weight: bold; }
+    canvas.dino-canvas {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      width: 100%;
+      touch-action: manipulation;
+    }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 8px; background: #fff; border-radius: 16px; }
+    .cell { aspect-ratio: 1; border-radius: 10px; background: var(--marshmallow); display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: transform 0.15s, background 0.2s; }
+    .cell.filled { background: linear-gradient(135deg, var(--pink), var(--accent)); }
+    .cell.burn { animation: burn 0.5s ease both; }
+    @keyframes burn { 0% { transform: scale(1); opacity: 1;} 50% { transform: scale(1.25); opacity: 0.6;} 100% { transform: scale(0); opacity: 0;} }
+    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .mem-card { aspect-ratio: 1; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #ff8fb5); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; transition: transform 0.25s; perspective: 400px; }
+    .mem-card.matched { background: #fff; box-shadow: 0 0 0 2px var(--pink) inset; }
+    .clicker-btn {
+      font-size: 120px; display: inline-block; cursor: pointer; -webkit-user-select: none; user-select: none;
+      animation: heartBeat 1s ease infinite;
+    }
+    .game-end { text-align: center; padding: 20px; }
+
+    /* Модалка */
+    .modal-bg {
+      position: fixed; inset: 0;
+      background: rgba(40,18,28,0.5);
+      z-index: 45;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      animation: fadeUp 0.25s ease both;
+    }
+    .modal {
+      background: #fff;
+      border-radius: 22px;
+      padding: 24px;
+      max-width: 340px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+      animation: popIn 0.3s ease both;
+    }
+    .modal .emo { font-size: 44px; }
+    .modal .txt { margin: 12px 0 16px; font-size: 15px; }
+
+    /* Квест */
+    .quest-card { text-align: center; }
+    .quest-q { font-size: 19px; font-weight: bold; margin: 4px 0 16px; }
+    .quest-opt {
+      display: block; width: 100%;
+      background: #fff; border: 2px solid var(--pink);
+      border-radius: 16px; padding: 13px; margin-bottom: 10px;
+      font-size: 15px; cursor: pointer; font-family: inherit; color: var(--dark);
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .quest-opt:active { transform: scale(0.97); }
+    .quest-opt.correct { border-color: #7ed957; background: #efffe6; }
+    .quest-opt.wrong { border-color: #ff8787; background: #fff0f0; }
+    .quest-progress { color: #b07a8f; font-size: 13px; margin-bottom: 8px; }
+    .msg-frame {
+      background: linear-gradient(135deg, #fff, var(--marshmallow));
+      border: 2px solid var(--pink);
+      border-radius: 20px;
+      padding: 20px;
+      font-size: 15px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      margin: 10px 0;
+    }
+
+    /* Адаптив: на компьютере горизонтальная линия тайм-линии */
+    @media (min-width: 640px) {
+      .timeline { padding: 40px 0 14px; }
+      .tl-line {
+        top: 34px; left: 30px; right: 30px; height: 6px;
+      }
+      .tl-marker { top: 25px; left: 30px; }
+      .tl-points { flex-direction: row; align-items: flex-start; }
+      .tl-point {
+        flex: 1; flex-direction: column; text-align: center; gap: 6px; background: transparent;
+      }
+      .tl-dot { width: 52px; height: 52px; }
+      .tl-gap { padding: 0; justify-content: center; padding-top: 44px; }
+      .tl-badge { margin: 0; }
+      .tl-txt { order: 2; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Фон из летающих сердечек -->
+  <div class="hearts-bg" id="heartsBg"></div>
+
+  <div class="app">
+    <!-- СЕКЦИЯ 3: Верхняя панель -->
+    <header class="topbar">Наши 6 месяцев знакомства ❤️</header>
+
+    <main id="content">
+
+      <!-- ================= СЕКЦИЯ 4: ГЛАВНАЯ ================= -->
+      <section class="panel active" id="panel-home">
+        <h1>Привет, любимая ❤️</h1>
+        <p class="subtitle">6 месяцев с того дня, как мы встретились</p>
+
+        <div class="counters">
+          <div class="counter-card big">
+            <div class="counter-label">Мы знакомы уже</div>
+            <div class="counter-num" id="daysMeet">…</div>
+            <div class="counter-dayword">дней</div>
+          </div>
+          <div class="counter-card small">
+            <div class="counter-label">Мы вместе уже</div>
+            <div class="counter-num" id="daysStart">…</div>
+            <div class="counter-dayword">дней</div>
+          </div>
+        </div>
+
+        <!-- Хронология любви -->
+        <div class="card" style="margin-bottom: 8px;">
+          <h2>⭐ Хронология любви</h2>
+          <div class="timeline" id="timeline">
+            <div class="tl-line"></div>
+            <div class="tl-marker">💖</div>
+            <div class="tl-points">
+              <div class="tl-point" data-type="meet">
+                <div class="tl-dot">🌸</div>
+                <div class="tl-txt">
+                  <div class="tl-label">13 мая</div>
+                  <div class="tl-sub">Мы познакомились</div>
+                </div>
+              </div>
+
+              <div class="tl-gap">26 дней до первого «да»</div>
+
+              <div class="tl-point" data-type="start">
+                <div class="tl-dot">❤️</div>
+                <div class="tl-txt">
+                  <div class="tl-label">8 июня</div>
+                  <div class="tl-sub">Стали парой</div>
+                </div>
+              </div>
+
+              <div class="tl-gap"><span id="tlTogether">вместе N дней</span></div>
+
+              <div class="tl-badge">наша история продолжается ❤️</div>
+
+              <div class="tl-point" data-type="today">
+                <div class="tl-dot">✨</div>
+                <div class="tl-txt">
+                  <div class="tl-label">Сегодня</div>
+                  <div class="tl-sub">И вот мы здесь</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tiles">
+          <button class="btn" id="btnQuest"><span class="big">🧩</span>Пройти квест</button>
+          <button class="btn" id="btnSweet"><span class="big">✨</span>Что-то милое</button>
+        </div>
+      </section>
+
+      <!-- ================= СЕКЦИЯ 6: ПОЦЕЛУЙЧИК ================= -->
+      <section class="panel" id="panel-kiss">
+        <div class="kiss-wrap">
+          <h2>💋 Поцелуйчик</h2>
+          <p class="kiss-hint">Нажми на сердечко, чтобы получить поцелуйчик 😘</p>
+          <div class="kiss-heart" id="kissHeart">💖</div>
+          <div class="kiss-count" id="kissCount">Ты уже поцеловала меня 0 раз ❤️</div>
+          <div id="kissMsg"></div>
+          <div style="margin-top: 22px;">
+            <button class="btn" id="btnShareKiss">💋 Поделиться поцелуем</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= СЕКЦИЯ 7: ГАЛЕРЕЯ ================= -->
+      <section class="panel" id="panel-gallery">
+        <div id="photoDay"></div>
+        <div id="photoGrid" class="photo-grid"></div>
+        <div id="galleryLoader" class="loader"><span class="heart">💖</span></div>
+        <div id="galleryEmpty" class="empty-note hidden">Пока здесь только наши будущие воспоминания ❤️</div>
+      </section>
+
+      <!-- ================= СЕКЦИЯ 8: ИГРЫ ================= -->
+      <section class="panel" id="panel-games">
+        <h2 style="margin-bottom:14px;">🎮 Игры для нас</h2>
+        <div class="games-grid">
+          <div class="game-card" data-game="dino">
+            <div class="game-ico">🦖</div>
+            <div class="game-info"><div class="game-name">Динозаврик-сердечко</div><div class="game-desc">Прыгай через кактусы 🌵💔</div></div>
+            <div class="game-best" id="best-dino"></div>
+          </div>
+          <div class="game-card" data-game="block">
+            <div class="game-ico">🧱</div>
+            <div class="game-info"><div class="game-name">Блок-бласт</div><div class="game-desc">Собирай линии и сжигай их 💖</div></div>
+            <div class="game-best" id="best-block"></div>
+          </div>
+          <div class="game-card" data-game="memory">
+            <div class="game-ico">🃏</div>
+            <div class="game-info"><div class="game-name">Найди пару</div><div class="game-desc">6 пар милых эмодзи</div></div>
+            <div class="game-best" id="best-memory"></div>
+          </div>
+          <div class="game-card" data-game="clicker">
+            <div class="game-ico">💋</div>
+            <div class="game-info"><div class="game-name">Кликер поцелуев</div><div class="game-desc">Сколько успеешь за 30 сек?</div></div>
+            <div class="game-best" id="best-clicker"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= СЕКЦИЯ 9: ПОСЛАНИЕ ================= -->
+      <section class="panel" id="panel-message">
+        <h2>💌 Послание</h2>
+        <p class="subtitle">Послание от меня прямо сейчас:</p>
+        <div class="card">
+          <div class="msg-frame" id="msgText">Загружаю наше послание… 💌</div>
+          <div class="tiles" style="margin-top:12px;">
+            <button class="btn" id="btnAnswerKiss">💋 Поцеловать в ответ</button>
+            <button class="btn ghost" id="btnRefreshMsg">🔄 Обновить</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- СЕКЦИЯ 3: Нижняя панель вкладок -->
+    <nav class="tabbar">
+      <div class="tab active" data-tab="home"><span class="ico">🏠</span>Главная</div>
+      <div class="tab" data-tab="kiss"><span class="ico">💋</span>Поцелуйчик</div>
+      <div class="tab" data-tab="gallery"><span class="ico">📸</span>Галерея</div>
+      <div class="tab" data-tab="games"><span class="ico">🎮</span>Игры</div>
+      <div class="tab" data-tab="message"><span class="ico">💌</span>Послание</div>
+    </nav>
+  </div>
+
+  <!-- Слой для частиц -->
+  <div id="fx-layer" style="position:fixed; inset:0; pointer-events:none; z-index:60;"></div>
+
+  <!-- Тост-подсказка -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Модалка -->
+  <div id="modalBg" class="modal-bg hidden">
+    <div class="modal">
+      <div class="emo" id="modalEmo">🥺</div>
+      <div class="txt" id="modalTxt"></div>
+      <button class="btn" id="modalBtn">Хорошо 💕</button>
+    </div>
+  </div>
+
+  <!-- Полноэкранный просмотр фото -->
+  <div id="photoViewer" class="photo-viewer hidden">
+    <img id="pvImg" src="" alt="фото" />
+    <div class="cap" id="pvCap"></div>
+    <button class="close" id="pvClose">Закрыть ✕</button>
+  </div>
+
+  <!-- Квест (оверлей) -->
+  <div id="questLayer" class="game-layer hidden">
+    <div class="gl-top">
+      <button class="btn ghost" id="questBack">⬅️ Назад</button>
+      <span class="quest-progress" id="questProgress">Вопрос 1 из 3</span>
+      <span style="width:70px"></span>
+    </div>
+    <div class="card quest-card">
+      <h2>🧩 Квест для любимой</h2>
+      <div class="quest-q" id="questQ"></div>
+      <div id="questOpts"></div>
+    </div>
+  </div>
+
+  <!-- Слой для игр (оверлей) -->
+  <div id="gameLayer" class="game-layer hidden">
+    <div class="gl-top">
+      <button class="btn ghost" id="gameBack">⬅️ К играм</button>
+      <span class="gl-title" id="gameTitle"></span>
+      <span class="gl-score" id="gameScore"></span>
+    </div>
+    <div id="gameBody"></div>
+  </div>
+
+  <script>
+    /* ============================================================
+       СЕКЦИЯ 1: Инициализация Telegram WebApp
+       ============================================================ */
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    function haptic(type) {
+      try { if (tg) tg.HapticFeedback.impactOccurred(type || 'light'); } catch (e) {}
+    }
+    function hapticSuccess() {
+      try { if (tg) tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
+    }
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      try { tg.setHeaderColor('#FFD1DC'); } catch (e) {}
+      try { tg.setBackgroundColor('#FFF0F5'); } catch (e) {}
+    }
+
+    /* ============================================================
+       СЕКЦИЯ 10: Константы
+       ============================================================ */
+    const CONST_SUPABASE_URL = 'ВСТАВЬ_URL';
+    const CONST_SUPABASE_KEY = 'ВСТАВЬ_KEY';
+    const CONST_DATE_MEET  = '2024-05-13';
+    const CONST_DATE_START = '2024-06-08';
+
+    const supabaseReady = (CONST_SUPABASE_URL.includes('ВСТАВЬ') === false);
+
+    /* ============================================================
+       Утилиты
+       ============================================================ */
+    const $ = (sel) => document.querySelector(sel);
+    const fxLayer = $('#fx-layer');
+
+    function toast(text, ms) {
+      const t = $('#toast');
+      t.textContent = text;
+      t.classList.remove('hidden');
+      clearTimeout(t._t);
+      t._t = setTimeout(() => t.classList.add('hidden'), ms || 1800);
+    }
+
+    function showModal(emo, txt) {
+      $('#modalEmo').textContent = emo;
+      $('#modalTxt').textContent = txt;
+      $('#modalBg').classList.remove('hidden');
+    }
+    $('#modalBtn').addEventListener('click', () => {
+      $('#modalBg').classList.add('hidden');
+      haptic('light');
+    });
+
+    /* ============================================================
+       СЕКЦИЯ 4.5: Эталонные частицы
+       ============================================================ */
+    function spawnParticles(originEl, container, emojis, count) {
+      const existing = container.querySelectorAll('.particle');
+      if (existing.length > 30) return;
+      const rect = originEl.getBoundingClientRect();
+      const contRect = container.getBoundingClientRect();
+      const originX = rect.left - contRect.left + rect.width / 2;
+      const originY = rect.top - contRect.top + rect.height / 2;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 60 + Math.random() * 100;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+        const size = 14 + Math.random() * 14;
+        const duration = 900 + Math.random() * 600;
+        Object.assign(p.style, {
+          left: originX + 'px', top: originY + 'px',
+          fontSize: size + 'px',
+          transform: 'translate(-50%, -50%) scale(1)',
+          opacity: '1',
+          transition: `transform ${duration}ms cubic-bezier(0.2, 0.8, 0.3, 1), opacity ${duration}ms ease-out`
+        });
+        container.appendChild(p);
+        requestAnimationFrame(() => {
+          p.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.4)`;
+          p.style.opacity = '0';
+        });
+        setTimeout(() => p.remove(), duration + 50);
+      }
+    }
+
+    // «Расцветание» для точки «8 июня»: лепестки по кругу + scale/glow
+    function spawnBloom(originEl, container) {
+      const rect = originEl.getBoundingClientRect();
+      const contRect = container.getBoundingClientRect();
+      const cx = rect.left - contRect.left + rect.width / 2;
+      const cy = rect.top - contRect.top + rect.height / 2;
+      const petals = ['💐', '❤️', '🌸', '💖', '🌷', '✨'];
+      const n = 7;
+      for (let i = 0; i < n; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.textContent = petals[i % petals.length];
+        const angle = (i / n) * Math.PI * 2;
+        const distance = 70 + Math.random() * 40;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+        const size = 18 + Math.random() * 10;
+        const duration = 1000 + Math.random() * 500;
+        Object.assign(p.style, {
+          left: cx + 'px', top: cy + 'px', fontSize: size + 'px',
+          transform: 'translate(-50%, -50%) scale(1)', opacity: '1',
+          transition: `transform ${duration}ms cubic-bezier(0.2,0.8,0.3,1), opacity ${duration}ms ease-out`
+        });
+        container.appendChild(p);
+        requestAnimationFrame(() => {
+          p.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.5)`;
+          p.style.opacity = '0';
+        });
+        setTimeout(() => p.remove(), duration + 50);
+      }
+    }
+
+    /* ============================================================
+       СЕКЦИЯ 3: Переключение вкладок
+       ============================================================ */
+    const panels = {
+      home: $('#panel-home'),
+      kiss: $('#panel-kiss'),
+      gallery: $('#panel-gallery'),
+      games: $('#panel-games'),
+      message: $('#panel-message')
+    };
+    function switchTab(name) {
+      Object.keys(panels).forEach(k => {
+        panels[k].classList.toggle('active', k === name);
+        panels[k].scrollTop = 0;
+      });
+      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+      $('#content').scrollTop = 0;
+      haptic('light');
+      if (name === 'gallery') loadGallery();
+      if (name === 'message') loadMessage();
+    }
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+
+    /* ============================================================
+       СЕКЦИЯ 4: Счётчики дней и хронология
+       ============================================================ */
+    function daysBetween(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      return Math.floor((now - d) / 86400000);
+    }
+    function wordDays(n) {
+      const d = n % 10, h = n % 100;
+      if (d === 1 && h !== 11) return 'день';
+      if (d >= 2 && d <= 4 && (h < 12 || h > 14)) return 'дня';
+      return 'дней';
+    }
+    function initCounters() {
+      const meet = daysBetween(CONST_DATE_MEET);
+      const start = daysBetween(CONST_DATE_START);
+      $('#daysMeet').textContent = meet;
+      $('#daysStart').textContent = start;
+      $('#tlTogether').textContent = `вместе ${start} ${wordDays(start)}`;
+    }
+
+    let timelineAnimating = false; // антиспам на 1 сек
+    function initTimeline() {
+      const points = document.querySelectorAll('.tl-point');
+      points.forEach((pt, i) => {
+        pt.style.animationDelay = (0.15 * i) + 's';
+      });
+      // Каскадное появление
+      points.forEach((pt, i) => {
+        pt.addEventListener('click', () => {
+          if (timelineAnimating) return;
+          const type = pt.dataset.type;
+          const tips = {
+            meet: '🌸 Здесь всё началось',
+            start: '❤️ Мой самый счастливый день',
+            today: '✨ И это только начало'
+          };
+          toast(tips[type], 1600);
+
+          if (type === 'start') {
+            timelineAnimating = true;
+            haptic('medium');
+            pt.classList.add('blooming');
+            spawnBloom(pt, fxLayer);
+            setTimeout(() => { pt.classList.remove('blooming'); timelineAnimating = false; }, 1000);
+          } else if (type === 'today') {
+            timelineAnimating = true;
+            haptic('medium');
+            spawnParticles(pt, fxLayer, ['❤️', '💖', '💕', '✨', '💗', '🌸'], 14);
+            setTimeout(() => {
+              toast('Наша история продолжается ❤️', 1800);
+              timelineAnimating = false;
+            }, 120);
+          } else {
+            haptic('light');
+          }
+        });
+      });
+    }
+
+    // Кнопки-плитки
+    $('#btnQuest').addEventListener('click', () => openQuest());
+    $('#btnSweet').addEventListener('click', () => switchTab('kiss'));
+
+    /* ============================================================
+       Supabase-хелперы
+       ============================================================ */
+    async function supabaseFetch(path) {
+      if (!supabaseReady) throw new Error('no supabase');
+      const res = await fetch(CONST_SUPABASE_URL + '/rest/v1/' + path, {
+        headers: {
+          apikey: CONST_SUPABASE_KEY,
+          Authorization: 'Bearer ' + CONST_SUPABASE_KEY
+        }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json();
+    }
+    async function saveScore(game, score) {
+      if (!supabaseReady) return;
+      try {
+        await fetch(CONST_SUPABASE_URL + '/rest/v1/game_scores', {
+          method: 'POST',
+          headers: {
+            apikey: CONST_SUPABASE_KEY,
+            Authorization: 'Bearer ' + CONST_SUPABASE_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ game: game, score: score, created_at: new Date().toISOString() })
+        });
+      } catch (e) {}
+    }
+
+    /* ============================================================
+       СЕКЦИЯ 9: Послание
+       ============================================================ */
+    async function loadMessage() {
+      const el = $('#msgText');
+      try {
+        const data = await supabaseFetch('messages?id=eq.1&select=text');
+        if (data && data.length && data[0].text) {
+          el.textContent = data[0].text;
+        } else {
+          el.textContent = 'Не получилось загрузить послание, но я всё равно тебя люблю ❤️';
+        }
+      } catch (e) {
+        el.textContent = 'Не получилось загрузить послание, но я всё равно тебя люблю ❤️';
+      }
+    }
+    $('#btnAnswerKiss').addEventListener('click', () => switchTab('kiss'));
+    $('#btnRefreshMsg').addEventListener('click', () => { haptic('light'); loadMessage(); });
+
+    /* ============================================================
+       СЕКЦИЯ 5: Квест
+       ============================================================ */
+    const questData = [
+      { q: 'Какого числа мы познакомились?', opts: ['13 мая', '14 мая', '13 июня', '8 июня'], correct: '13 мая' },
+      { q: 'Какого числа мы стали парой?', opts: ['8 июня', '13 мая', '8 июля', '14 июня'], correct: '8 июня' },
+      { q: 'Где было наше первое свидание?', opts: ['В парке', 'В кино', 'В кафе', 'На набережной'], correct: 'В кафе' }
+    ];
+    let questStep = 0;
+    function openQuest() {
+      questStep = 0;
+      haptic('light');
+      renderQuest();
+      $('#questLayer').classList.remove('hidden');
+    }
+    function renderQuest() {
+      $('#questProgress').textContent = 'Вопрос ' + (questStep + 1) + ' из ' + questData.length;
+      $('#questQ').textContent = questData[questStep].q;
+      const box = $('#questOpts');
+      box.innerHTML = '';
+      questData[questStep].opts.forEach(opt => {
+        const b = document.createElement('button');
+        b.className = 'quest-opt';
+        b.textContent = opt;
+        b.addEventListener('click', () => answerQuest(opt, b));
+        box.appendChild(b);
+      });
+    }
+    function answerQuest(opt, btn) {
+      if (opt === questData[questStep].correct) {
+        haptic('medium');
+        btn.classList.add('correct');
+        if (questStep < questData.length - 1) {
+          setTimeout(() => { questStep++; renderQuest(); }, 500);
+        } else {
+          // Квест пройден -> показать послание
+          setTimeout(() => {
+            $('#questLayer').classList.add('hidden');
+            switchTab('message');
+            toast('Ты прошла квест! 💖', 2000);
+            hapticSuccess();
+          }, 600);
+        }
+      } else {
+        haptic('medium');
+        btn.classList.add('wrong');
+        showModal('🥺', 'Хмм, близко, но попробуй ещё раз!');
+        setTimeout(() => btn.classList.remove('wrong'), 500);
+      }
+    }
+    $('#questBack').addEventListener('click', () => $('#questLayer').classList.add('hidden'));
+
+    /* ============================================================
+       СЕКЦИЯ 6: Поцелуйчик
+       ============================================================ */
+    let kissCount = parseInt(localStorage.getItem('kissCount') || '0', 10);
+    const kissMessages = [
+      'Ты самая любимая ❤️',
+      'Ещё один поцелуйчик 😘',
+      'Я таю 🫠',
+      'Люблю тебя больше всего на свете 💖',
+      'Как хорошо, что мы познакомились 🌸',
+      'Ты моё самое большое счастье 🥰',
+      'Целую тебя нежно 💋',
+      'Не могу перестать тебя любить 💕'
+    ];
+    function renderKiss() {
+      $('#kissCount').textContent = 'Ты уже поцеловала меня ' + kissCount + ' раз ❤️';
+    }
+    $('#kissHeart').addEventListener('click', (e) => {
+      haptic('heavy');
+      kissCount++;
+      localStorage.setItem('kissCount', kissCount);
+      renderKiss();
+
+      // всплывающее сообщение
+      const msg = $('#kissMsg');
+      msg.innerHTML = '<div class="kiss-msg">' + kissMessages[Math.floor(Math.random() * kissMessages.length)] + '</div>';
+
+      // 10% шанс «большой поцелуй»
+      const big = Math.random() < 0.10;
+      const heart = $('#kissHeart');
+      heart.classList.add('super');
+      setTimeout(() => heart.classList.remove('super'), big ? 600 : 300);
+
+      const emojis = ['❤️', '💖', '💋', '💕', '😘'];
+      if (big) {
+        hapticSuccess();
+        spawnParticles(heart, fxLayer, emojis, 50);
+        toast('БОЛЬШОЙ ПОЦЕЛУЙ! 💞', 1500);
+      } else {
+        spawnParticles(heart, fxLayer, emojis, 8 + Math.floor(Math.random() * 8));
+      }
+
+      // фон вспыхивает розовым на 0.3 сек
+      document.body.classList.add('flash');
+      setTimeout(() => document.body.classList.remove('flash'), 300);
+
+      // сохранить счёт в Supabase (дебаунс)
+      scheduleKissSave();
+    });
+    let kissSaveTimer = null;
+    function scheduleKissSave() {
+      clearTimeout(kissSaveTimer);
+      kissSaveTimer = setTimeout(() => saveScore('kiss', kissCount), 1500);
+    }
+    $('#btnShareKiss').addEventListener('click', () => {
+      haptic('medium');
+      if (tg) {
+        try { tg.sendData(JSON.stringify({ type: 'kiss', count: kissCount })); } catch (e) {}
+      }
+      toast('Поцелуй отправлен! 😘', 1600);
+    });
+
+    /* ============================================================
+       СЕКЦИЯ 7: Галерея
+       ============================================================ */
+    let photosLoaded = false;
+    async function loadGallery() {
+      if (photosLoaded) return;
+      photosLoaded = true;
+      $('#galleryLoader').classList.remove('hidden');
+      $('#galleryEmpty').classList.add('hidden');
+      try {
+        const photos = await supabaseFetch('photos?select=*&order=created_at.desc');
+        renderPhotos(photos || []);
+        renderPhotoOfDay(photos || []);
+      } catch (e) {
+        renderPhotos([]);
+      } finally {
+        $('#galleryLoader').classList.add('hidden');
+      }
+    }
+    function renderPhotos(photos) {
+      const grid = $('#photoGrid');
+      grid.innerHTML = '';
+      if (!photos.length) {
+        $('#galleryEmpty').classList.remove('hidden');
+        return;
+      }
+      photos.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+        card.style.animationDelay = (i * 0.06) + 's';
+        card.innerHTML = '<img src="' + (p.url || '') + '" alt="" loading="lazy" onerror="this.style.opacity=0.2">' +
+          '<div class="cap">' + (p.caption || '❤️') + '</div>';
+        card.addEventListener('click', () => openViewer(p.url, p.caption));
+        grid.appendChild(card);
+      });
+    }
+    function openViewer(url, cap) {
+      haptic('light');
+      $('#pvImg').src = url || '';
+      $('#pvCap').textContent = cap || '';
+      $('#photoViewer').classList.remove('hidden');
+    }
+    $('#pvClose').addEventListener('click', () => $('#photoViewer').classList.add('hidden'));
+    $('#photoViewer').addEventListener('click', (e) => {
+      if (e.target === $('#photoViewer')) $('#photoViewer').classList.add('hidden');
+    });
+
+    // Фото дня
+    function todayKey() {
+      const d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function renderPhotoOfDay(photos) {
+      const box = $('#photoDay');
+      box.innerHTML = '';
+      if (!photos.length) return;
+      const key = todayKey();
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem('photoDay') || 'null'); } catch (e) {}
+      let photo;
+      if (saved && saved.key === key) {
+        photo = photos.find(p => (p.id === saved.id)) || photos[0];
+      } else {
+        const seed = key.split('-').join('');
+        const idx = parseInt(seed, 10) % photos.length;
+        photo = photos[idx];
+        localStorage.setItem('photoDay', JSON.stringify({ key: key, id: photo.id }));
+      }
+      box.innerHTML =
+        '<div class="photo-day">' +
+          '<img src="' + (photo.url || '') + '" alt="" onerror="this.style.opacity=0.2">' +
+          '<div class="pd-txt">' +
+            '<div class="pd-title">📸 Фото дня</div>' +
+            '<div class="pd-timer" id="pdTimer"></div>' +
+          '</div>' +
+        '</div>';
+      box.querySelector('.photo-day').addEventListener('click', () => openViewer(photo.url, photo.caption));
+      startDayTimer();
+    }
+    function startDayTimer() {
+      const el = $('#pdTimer');
+      function tick() {
+        const now = new Date();
+        const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        let s = Math.floor((midnight - now) / 1000);
+        const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+        el.textContent = 'Новое фото через ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+      }
+      tick();
+      clearInterval(window._pdTimer);
+      window._pdTimer = setInterval(tick, 1000);
+    }
+
+    /* ============================================================
+       СЕКЦИЯ 8: Игры
+       ============================================================ */
+    const gameSel = { dino: $('#best-dino'), block: $('#best-block'), memory: $('#best-memory'), clicker: $('#best-clicker') };
+    function bestLabel(key) {
+      const v = parseInt(localStorage.getItem('best_' + key) || '0', 10);
+      return v > 0 ? 'Рекорд: ' + v : '';
+    }
+    ['dino','block','memory','clicker'].forEach(k => gameSel[k].textContent = bestLabel(k));
+
+    document.querySelectorAll('.game-card').forEach(card => {
+      card.addEventListener('click', () => {
+        haptic('light');
+        openGame(card.dataset.game);
+      });
+    });
+    $('#gameBack').addEventListener('click', (e) => {
+      closeGame();
+      switchTab('games');
+    });
+
+    function openGame(name) {
+      $('#gameLayer').classList.remove('hidden');
+      const titles = { dino: '🦖 Динозаврик', block: '🧱 Блок-бласт', memory: '🃏 Найди пару', clicker: '💋 Кликер' };
+      $('#gameTitle').textContent = titles[name];
+      $('#gameScore').textContent = '';
+      $('#gameBody').innerHTML = '';
+      if (name === 'dino') startDino();
+      else if (name === 'block') startBlock();
+      else if (name === 'memory') startMemory();
+      else if (name === 'clicker') startClicker();
+    }
+    function closeGame() {
+      // останавливаем все игровые циклы
+      if (window._dinoRaf) { cancelAnimationFrame(window._dinoRaf); window._dinoRaf = null; }
+      if (window._clickerTimer) { clearInterval(window._clickerTimer); window._clickerTimer = null; }
+      $('#gameLayer').classList.add('hidden');
+    }
+    function gameEnd(title, score, bestKey, endEl) {
+      let best = parseInt(localStorage.getItem('best_' + bestKey) || '0', 10);
+      const isNew = score > best;
+      if (isNew) best = score;
+      localStorage.setItem('best_' + bestKey, best);
+      gameSel[bestKey].textContent = 'Рекорд: ' + best;
+      saveScore(bestKey, score);
+      if (isNew) hapticSuccess();
+      endEl.innerHTML =
+        '<h2 style="margin-bottom:8px;">' + (isNew ? '🏆 Новый рекорд!' : '💖') + '</h2>' +
+        '<p style="font-size:18px;margin-bottom:6px;">Твой результат: <b>' + score + '</b></p>' +
+        '<p style="font-size:13px;color:#8a5a6d;margin-bottom:16px;">Рекорд: ' + best + '</p>' +
+        '<div class="tiles"><button class="btn" id="btnAgain">🔁 Ещё раз</button><button class="btn ghost" id="btnToGames">⬅️ К играм</button></div>';
+      $('#btnAgain').addEventListener('click', () => openGame(bestKey));
+      $('#btnToGames').addEventListener('click', () => { closeGame(); switchTab('games'); });
+    }
+
+    /* --- Динозаврик --- */
+    function startDino() {
+      const body = $('#gameBody');
+      body.innerHTML = '<canvas class="dino-canvas" id="dinoCanvas" height="280"></canvas>' +
+        '<p class="empty-note">Тапни или нажми пробел, чтобы прыгнуть 💕</p>';
+      const canvas = $('#dinoCanvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.parentElement.clientWidth - 0;
+      canvas.width = W;
+      canvas.height = 280;
+
+      let dino = { x: 60, y: 0, vy: 0, w: 40, h: 40 };
+      const groundY = 240;
+      let obstacles = [];
+      let score = 0, speed = 5, frame = 0, over = false;
+
+      function reset() {
+        dino.y = groundY - dino.h; dino.vy = 0;
+        obstacles = []; score = 0; speed = 5; frame = 0; over = false;
+      }
+      reset();
+
+      function jump() {
+        if (over) return;
+        if (dino.y >= groundY - dino.h) { dino.vy = -13; haptic('light'); }
+      }
+      canvas.addEventListener('pointerdown', jump);
+      window.addEventListener('keydown', function kh(e) {
+        if (e.code === 'Space') { e.preventDefault(); jump(); }
+      });
+
+      function spawnObs() {
+        const o = { x: W + 20, y: groundY - 30, w: 22, h: 30, type: Math.random() < 0.5 ? '🌵' : '💔' };
+        obstacles.push(o);
+      }
+      function loop() {
+        if (over) return;
+        ctx.clearRect(0, 0, W, canvas.height);
+
+        // земля
+        ctx.fillStyle = '#ffd6e6';
+        ctx.fillRect(0, groundY, W, 4);
+
+        // динозавр
+        dino.vy += 0.8; dino.y += dino.vy;
+        if (dino.y >= groundY - dino.h) { dino.y = groundY - dino.h; dino.vy = 0; }
+        ctx.font = '40px "Segoe UI Emoji", "Comic Sans MS", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🦖', dino.x + dino.w / 2, dino.y + dino.h - 6);
+
+        // кактусы
+        frame++;
+        if (frame % Math.max(30, Math.floor(80 - score)) === 0) spawnObs();
+        obstacles = obstacles.filter(o => o.x > -40);
+        obstacles.forEach(o => {
+          o.x -= speed;
+          ctx.font = '30px "Segoe UI Emoji", "Comic Sans MS", sans-serif';
+          ctx.fillText(o.type, o.x + o.w / 2, o.y + 26);
+          // коллизия
+          const dx = (dino.x + dino.w / 2) - (o.x + o.w / 2);
+          const dy = (dino.y + dino.h / 2) - (o.y + 15);
+          if (Math.abs(dx) < 26 && Math.abs(dy) < 26) { over = true; }
+        });
+
+        score = Math.floor(frame / 6);
+        speed = Math.min(12, 5 + score * 0.05);
+        $('#gameScore').textContent = 'Счёт: ' + score;
+
+        if (!over) { window._dinoRaf = requestAnimationFrame(loop); }
+        else {
+          haptic('heavy');
+          body.innerHTML = '<div class="game-end" id="dinoEnd"></div>';
+          gameEnd('🦖 Динозаврик', score, 'dino', $('#dinoEnd'));
+        }
+      }
+      window._dinoRaf = requestAnimationFrame(loop);
+    }
+
+    /* --- Блок-бласт --- */
+    function startBlock() {
+      const body = $('#gameBody');
+      body.innerHTML = '<div class="grid-5" id="blockGrid"></div>' +
+        '<p class="empty-note">Заполняй ряды 💖, чтобы линия сгорала ✨</p>';
+      const grid = $('#blockGrid');
+      let cells = [];
+      let score = 0;
+      function renderGrid() {
+        grid.innerHTML = '';
+        for (let i = 0; i < 25; i++) {
+          const c = document.createElement('div');
+          c.className = 'cell' + (cells[i] ? ' filled' : '');
+          c.textContent = cells[i] ? '💖' : '';
+          c.addEventListener('click', () => place(i, c));
+          grid.appendChild(c);
+        }
+      }
+      function checkLines() {
+        const burnSet = new Set();
+        for (let r = 0; r < 5; r++) {
+          const row = [0,1,2,3,4].map(c => r*5+c);
+          if (row.every(i => cells[i])) row.forEach(i => burnSet.add(i));
+        }
+        for (let c = 0; c < 5; c++) {
+          const col = [0,1,2,3,4].map(r => r*5+c);
+          if (col.every(i => cells[i])) col.forEach(i => burnSet.add(i));
+        }
+        return burnSet;
+      }
+      function place(i, cellEl) {
+        if (cells[i]) return;
+        cells[i] = true;
+        cellEl.classList.add('filled');
+        cellEl.textContent = '💖';
+        cellEl.classList.add('popIn');
+        haptic('light');
+        const burnSet = checkLines();
+        if (burnSet.size > 0) {
+          haptic('medium');
+          const elMap = {};
+          grid.querySelectorAll('.cell').forEach(el => elMap[el.dataset.i] = el);
+          burnSet.forEach(idx => {
+            grid.children[idx].classList.add('burn');
+            cells[idx] = false;
+          });
+          const lines = burnSet.size >= 5 ? Math.floor(burnSet.size / 5) : burnSet.size;
+          score += burnSet.size * 10;
+          $('#gameScore').textContent = 'Счёт: ' + score;
+          spawnParticles(document.querySelector('.grid-5'), fxLayer, ['💖','✨','💕'], Math.min(12, burnSet.size));
+          setTimeout(renderGrid, 520);
+        }
+      }
+      // проставить data-i
+      setTimeout(() => {
+        grid.querySelectorAll('.cell').forEach((el, i) => el.dataset.i = i);
+      }, 0);
+      renderGrid();
+      $('#gameScore').textContent = 'Счёт: 0';
+      // кнопка завершить
+      body.insertAdjacentHTML('beforeend',
+        '<div style="text-align:center;margin-top:14px;"><button class="btn" id="blockDone">Готово 💖</button></div>');
+      $('#blockDone').addEventListener('click', () => {
+        body.innerHTML = '<div class="game-end" id="blockEnd"></div>';
+        gameEnd('🧱 Блок-бласт', score, 'block', $('#blockEnd'));
+      });
+    }
+
+    /* --- Найди пару --- */
+    function startMemory() {
+      const body = $('#gameBody');
+      const emojis = ['🌸','❤️','💋','🦋','🌙','☀️'];
+      const deck = emojis.concat(emojis).sort(() => Math.random() - 0.5);
+      body.innerHTML = '<div class="memory-grid" id="memGrid"></div>';
+      const grid = $('#memGrid');
+      let opened = [], matched = 0, moves = 0;
+      deck.forEach((emo, i) => {
+        const card = document.createElement('div');
+        card.className = 'mem-card';
+        card.dataset.i = i; card.dataset.e = emo;
+        card.textContent = '';
+        card.addEventListener('click', () => flip(card, emo));
+        grid.appendChild(card);
+      });
+      let lock = false;
+      function flip(card, emo) {
+        if (lock || card.classList.contains('matched') || card.textContent) return;
+        haptic('light');
+        card.textContent = emo;
+        card.style.transform = 'rotateY(180deg)';
+        opened.push({ card, emo });
+        if (opened.length === 2) {
+          moves++;
+          lock = true;
+          if (opened[0].emo === opened[1].emo) {
+            setTimeout(() => {
+              opened.forEach(o => o.card.classList.add('matched'));
+              matched++;
+              haptic('medium');
+              opened = []; lock = false;
+              if (matched === 6) {
+                const score = Math.max(1, Math.round(100 - moves * 2));
+                body.innerHTML = '<div class="game-end" id="memEnd"></div>';
+                gameEnd('🃏 Найди пару', score, 'memory', $('#memEnd'));
+              }
+            }, 400);
+          } else {
+            setTimeout(() => {
+              opened.forEach(o => { o.card.textContent = ''; o.card.style.transform = ''; });
+              opened = []; lock = false;
+            }, 700);
+          }
+        }
+      }
+    }
+
+    /* --- Кликер поцелуев --- */
+    function startClicker() {
+      const body = $('#gameBody');
+      body.innerHTML = '<div style="text-align:center;"><div class="clicker-btn" id="clickBtn">💖</div>' +
+        '<p style="font-size:18px;color:#8a5a6d;margin:8px 0;" id="clickLeft">Осталось: 30 сек</p></div>';
+      const btn = $('#clickBtn');
+      let clicks = 0, timeLeft = 30;
+      btn.addEventListener('click', () => {
+        clicks++;
+        haptic('light');
+        spawnParticles(btn, fxLayer, ['💋','💖','😘'], 4);
+      });
+      $('#gameScore').textContent = 'Кликов: 0';
+      window._clickerTimer = setInterval(() => {
+        timeLeft--;
+        $('#clickLeft').textContent = 'Осталось: ' + timeLeft + ' сек';
+        $('#gameScore').textContent = 'Кликов: ' + clicks;
+        if (timeLeft <= 0) {
+          clearInterval(window._clickerTimer);
+          window._clickerTimer = null;
+          body.innerHTML = '<div class="game-end" id="clickEnd"></div>';
+          gameEnd('💋 Кликер поцелуев', clicks, 'clicker', $('#clickEnd'));
+        }
+      }, 1000);
+    }
+
+    /* ============================================================
+       Фон из летающих сердечек
+       ============================================================ */
+    function initHearts() {
+      const bg = $('#heartsBg');
+      const emos = ['❤️', '💖', '💕', '💗', '🌸', '💘'];
+      for (let i = 0; i < 16; i++) {
+        const s = document.createElement('span');
+        s.textContent = emos[Math.floor(Math.random() * emos.length)];
+        s.style.left = (Math.random() * 100) + 'vw';
+        s.style.fontSize = (16 + Math.random() * 18) + 'px';
+        s.style.animationDuration = (8 + Math.random() * 10) + 's';
+        s.style.animationDelay = (Math.random() * 12) + 's';
+        bg.appendChild(s);
+      }
+    }
+
+    /* ============================================================
+       Инициализация
+       ============================================================ */
+    initHearts();
+    initCounters();
+    initTimeline();
+    renderKiss();
+    switchTab('home');
+  </script>
+</body>
+</html>
