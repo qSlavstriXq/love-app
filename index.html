@@ -159,71 +159,89 @@
     /* Хронология любви */
     .timeline {
       position: relative;
-      padding: 10px 0 14px;
+      padding: 6px 0 4px;
     }
     .tl-line {
       position: absolute;
-      background: linear-gradient(90deg, var(--pink), var(--accent));
-      border-radius: 20px;
-      height: 6px;
+      left: 31.5px;
+      top: 12px;
+      bottom: 12px;
+      width: 5px;
+      background: linear-gradient(180deg, var(--pink), var(--accent));
+      border-radius: 6px;
     }
     .tl-marker {
       position: absolute;
-      font-size: 22px;
-      animation: markerX 6s ease-in-out infinite;
+      left: 24px;
+      top: 12px;
+      font-size: 20px;
+      animation: markerY 6s ease-in-out infinite;
       filter: drop-shadow(0 2px 4px rgba(255,107,157,0.6));
       z-index: 2;
     }
-    @keyframes markerX {
-      0%   { left: 0%; }
-      50%  { left: 100%; }
-      100% { left: 0%; }
+    @keyframes markerY {
+      0%   { top: 4%; }
+      50%  { top: 96%; }
+      100% { top: 4%; }
     }
-    .tl-points { display: flex; flex-direction: column; gap: 4px; }
+    .tl-points { display: flex; flex-direction: column; gap: 9px; }
     .tl-point {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 10px;
+      position: relative;
+      display: flex; align-items: center;
+      padding: 10px 14px 10px 62px;
+      min-height: 60px;
       border-radius: 16px;
-      background: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.65);
+      box-shadow: 0 4px 12px rgba(255,107,157,0.12);
       cursor: pointer;
       animation: fadeUp 0.5s ease both;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .tl-point:active { transform: scale(0.97); }
+    .tl-point:active { transform: scale(0.98); }
     .tl-dot {
-      width: 46px; height: 46px; flex-shrink: 0;
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px; height: 44px;
       display: flex; align-items: center; justify-content: center;
       font-size: 24px;
       background: #fff;
       border-radius: 50%;
-      box-shadow: 0 4px 12px rgba(255,107,157,0.25);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 12px rgba(255,107,157,0.28);
+      z-index: 2;
+      transition: box-shadow 0.3s ease;
     }
     .tl-point.blooming .tl-dot {
       animation: bloom 1s ease;
     }
     @keyframes bloom {
-      0%   { transform: scale(1); box-shadow: 0 0 0 rgba(255,107,157,0); }
-      40%  { transform: scale(1.6); box-shadow: 0 0 30px rgba(255,107,157,0.9); }
-      100% { transform: scale(1); box-shadow: 0 0 12px rgba(255,107,157,0.5); }
+      0%   { transform: translateY(-50%) scale(1); box-shadow: 0 0 0 rgba(255,107,157,0); }
+      40%  { transform: translateY(-50%) scale(1.5); box-shadow: 0 0 30px rgba(255,107,157,0.9); }
+      100% { transform: translateY(-50%) scale(1); box-shadow: 0 0 12px rgba(255,107,157,0.5); }
     }
     .tl-txt { flex: 1; }
     .tl-label { font-weight: bold; font-size: 15px; }
     .tl-sub { font-size: 12.5px; color: #8a5a6d; }
     .tl-gap {
-      display: flex; align-items: center; gap: 6px;
-      padding: 2px 6px 2px 22px;
-      color: #b07a8f; font-size: 12px;
+      align-self: center;
+      font-size: 12px;
+      color: #9a6b7e;
+      background: rgba(255,255,255,0.65);
+      border: 1px dashed rgba(255,107,157,0.4);
+      padding: 5px 14px;
+      border-radius: 20px;
+      text-align: center;
     }
-    .tl-gap::before { content: '·'; color: var(--accent); }
     .tl-badge {
-      display: inline-block;
-      margin: 4px 0 2px 22px;
+      align-self: center;
       font-size: 12px;
       color: #fff;
       background: linear-gradient(90deg, var(--accent), #ff8fb5);
-      padding: 4px 12px;
+      padding: 6px 16px;
       border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(255,107,157,0.3);
+      text-align: center;
       animation: popIn 0.6s ease both;
     }
 
@@ -500,19 +518,27 @@
 
     /* Адаптив: на компьютере горизонтальная линия тайм-линии */
     @media (min-width: 640px) {
-      .timeline { padding: 40px 0 14px; }
+      .timeline { padding: 46px 0 6px; }
       .tl-line {
-        top: 34px; left: 30px; right: 30px; height: 6px;
+        left: 24px; right: 24px; top: 32px; bottom: auto;
+        width: auto; height: 6px;
+        background: linear-gradient(90deg, var(--pink), var(--accent));
       }
-      .tl-marker { top: 25px; left: 30px; }
-      .tl-points { flex-direction: row; align-items: flex-start; }
+      .tl-marker { top: 23px; left: 24px; animation: markerX 7s ease-in-out infinite; }
+      @keyframes markerX {
+        0%   { left: 24px; }
+        50%  { left: calc(100% - 24px); }
+        100% { left: 24px; }
+      }
+      .tl-points { flex-direction: row; flex-wrap: wrap; }
       .tl-point {
-        flex: 1; flex-direction: column; text-align: center; gap: 6px; background: transparent;
+        flex: 1 1 0; flex-direction: column; text-align: center;
+        padding: 0 10px; background: transparent; box-shadow: none; min-height: 0;
       }
-      .tl-dot { width: 52px; height: 52px; }
-      .tl-gap { padding: 0; justify-content: center; padding-top: 44px; }
-      .tl-badge { margin: 0; }
-      .tl-txt { order: 2; }
+      .tl-dot { position: static; transform: none; margin: 0 auto 10px; width: 52px; height: 52px; }
+      .tl-txt { flex: none; }
+      .tl-gap { display: none; }
+      .tl-badge { flex-basis: 100%; width: fit-content; margin: 14px auto 0; }
     }
   </style>
 </head>
