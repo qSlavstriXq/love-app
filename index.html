@@ -13,12 +13,12 @@
        СЕКЦИЯ 2: ДИЗАЙН (космический градиент)
        ============================================================ */
     :root {
-      --pink: #9d54b3;        /* туманность / неоново-фиолетовый */
-      --marshmallow: #2e1b56; /* глубокий космический фиолет */
-      --peach: #e0559c;       /* неоново-маджента */
-      --accent: #ff6bb3;      /* космический розовый */
-      --accent2: #8f6bff;     /* неоновый фиолет */
-      --dark: #f1e8ff;        /* светлый текст на тёмном фоне */
+      --pink: #9d54b3;
+      --marshmallow: #2e1b56;
+      --peach: #e0559c;
+      --accent: #ff6bb3;
+      --accent2: #8f6bff;
+      --dark: #f1e8ff;
       --card: rgba(26, 14, 48, 0.5);
       --shadow: 0 8px 26px rgba(130, 70, 220, 0.28);
       --radius: 20px;
@@ -53,7 +53,8 @@
       bottom: -8vh;
       color: rgba(165, 85, 220, 0.35);
       font-size: 22px;
-      animation: floatUp linear infinite;
+      /* FIX #20: добавил 12s fallback на случай, если JS не отработает */
+      animation: floatUp 12s linear infinite;
       will-change: transform, opacity;
     }
     @keyframes floatUp {
@@ -63,7 +64,6 @@
       100% { transform: translateY(-115vh) rotate(-15deg) scale(0.9); opacity: 0; }
     }
 
-    /* Частицы (эталонный сниппет из СЕКЦИИ 4.5) */
     .particle {
       position: absolute;
       pointer-events: none;
@@ -82,7 +82,6 @@
       margin: 0 auto;
     }
 
-    /* Верхняя панель */
     .topbar {
       padding: 14px 18px;
       text-align: center;
@@ -96,7 +95,6 @@
       flex-shrink: 0;
     }
 
-    /* Контент */
     main {
       flex: 1;
       overflow-y: auto;
@@ -114,13 +112,17 @@
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    /* FIX #5: отдельный fade только для полноэкранных оверлеев */
+    @keyframes fade {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
     @keyframes popIn {
       0%   { opacity: 0; transform: scale(0.8); }
       60%  { transform: scale(1.05); }
       100% { opacity: 1; transform: scale(1); }
     }
 
-    /* Карточки */
     .card {
       background: var(--card);
       border-radius: var(--radius);
@@ -135,7 +137,6 @@
     h2 { font-size: 19px; text-align: center; margin-bottom: 10px; color: var(--accent); }
     .subtitle { text-align: center; color: #b8a6d6; font-size: 14px; margin-bottom: 16px; }
 
-    /* Счётчики-карточки */
     .counters { display: flex; gap: 12px; margin-bottom: 14px; }
     .counter-card {
       background: var(--card);
@@ -158,7 +159,6 @@
     .counter-label { font-size: 13px; color: #b8a6d6; }
     .counter-dayword { font-size: 12px; color: #9d8ac7; }
 
-    /* Хронология любви */
     .timeline {
       position: relative;
       padding: 6px 0 4px;
@@ -172,7 +172,6 @@
       background: linear-gradient(180deg, var(--pink), var(--accent));
       border-radius: 6px;
     }
-    /* Концы линии — видимые точки-ограничители */
     .tl-line::before,
     .tl-line::after {
       content: '';
@@ -233,10 +232,11 @@
     .tl-point.blooming .tl-dot {
       animation: bloom 1s ease;
     }
+    /* FIX #6: используем свойство scale (не трогает transform) — работает и на мобиле, и на десктопе */
     @keyframes bloom {
-      0%   { transform: translateY(-50%) scale(1); box-shadow: 0 0 0 rgba(165,85,220,0); }
-      40%  { transform: translateY(-50%) scale(1.5); box-shadow: 0 0 30px rgba(165,85,220,0.9); }
-      100% { transform: translateY(-50%) scale(1); box-shadow: 0 0 12px rgba(165,85,220,0.5); }
+      0%   { scale: 1;   box-shadow: 0 0 0 rgba(165,85,220,0); }
+      40%  { scale: 1.5; box-shadow: 0 0 30px rgba(165,85,220,0.9); }
+      100% { scale: 1;   box-shadow: 0 0 12px rgba(165,85,220,0.5); }
     }
     .tl-txt { flex: 1; }
     .tl-label { font-weight: bold; font-size: 15px; }
@@ -263,7 +263,6 @@
       animation: popIn 0.6s ease both;
     }
 
-    /* Кнопки */
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       background: linear-gradient(135deg, var(--accent), #8f6bff);
@@ -289,7 +288,6 @@
     .tiles .btn { padding: 16px 12px; flex-direction: column; font-size: 14px; }
     .tiles .btn .big { font-size: 26px; }
 
-    /* Тост-подсказка */
     .toast {
       position: fixed;
       left: 50%;
@@ -339,8 +337,8 @@
     .tab.active { color: var(--accent); background: rgba(165, 85, 220, 0.22); }
     .tab:active { transform: scale(0.92); }
 
-    /* Вспышка фона при поцелуе */
-    .flash .app::before, body.flash::after {
+    /* FIX #19: убрал двойной градиент — оставил один ::after на body */
+    body.flash::after {
       content: '';
       position: fixed; inset: 0;
       background: radial-gradient(circle, rgba(165,85,220,0.45), transparent 70%);
@@ -419,7 +417,6 @@
     .loader .heart { font-size: 44px; display: inline-block; animation: heartBeat 1s ease infinite; }
     .empty-note { text-align: center; color: #b8a6d6; padding: 30px 16px; font-size: 14px; }
 
-    /* Полноэкранный просмотр фото */
     .photo-viewer {
       position: fixed; inset: 0;
       background: rgba(8, 4, 22, 0.94);
@@ -474,13 +471,27 @@
       width: 100%;
       touch-action: manipulation;
     }
-    .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 8px; background: rgba(30, 17, 58, 0.55); border-radius: 16px; }
+    .block-board { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; padding: 8px; background: rgba(30, 17, 58, 0.75); border-radius: 16px; width: 100%; max-width: 480px; margin: 0 auto; }
+    .block-cell { appearance: none; aspect-ratio: 1; min-width: 0; padding: 0; border: 1px solid rgba(165,85,220,0.15); border-radius: 5px; background: var(--marshmallow); cursor: pointer; touch-action: manipulation; }
+    .block-cell.filled, .block-pixel.filled { background: linear-gradient(135deg, var(--pink), var(--accent)); box-shadow: inset 0 2px 0 rgba(255,255,255,0.25); }
+    .block-cell.preview { background: rgba(165,232,120,0.6); }
+    .block-cell.invalid { background: rgba(255,100,120,0.5); }
+    .block-cell.burn { animation: burn 0.35s ease both; }
+    .block-cell:focus-visible, .block-piece:focus-visible { outline: 2px solid #a5e878; outline-offset: 2px; }
+    .block-hint { text-align: center; color: #c9b8ec; font-size: 13px; min-height: 36px; margin: 14px 0; }
+    .block-tray { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; max-width: 480px; margin: auto; }
+    .block-piece { display: flex; align-items: center; justify-content: center; min-height: 100px; padding: 8px 2px; background: var(--card); color: #c9b8ec; border: 2px solid transparent; border-radius: 14px; cursor: pointer; touch-action: manipulation; }
+    .block-piece.selected { border-color: var(--accent); background: rgba(165,85,220,0.25); }
+    .block-piece:disabled { opacity: 0.3; cursor: default; }
+    .block-mini { display: grid; gap: 3px; pointer-events: none; }
+    .block-pixel { width: 16px; height: 16px; border-radius: 3px; }
     .cell { aspect-ratio: 1; border-radius: 10px; background: var(--marshmallow); display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: transform 0.15s, background 0.2s; }
     .cell.filled { background: linear-gradient(135deg, var(--pink), var(--accent)); }
     .cell.burn { animation: burn 0.5s ease both; }
     @keyframes burn { 0% { transform: scale(1); opacity: 1;} 50% { transform: scale(1.25); opacity: 0.6;} 100% { transform: scale(0); opacity: 0;} }
-    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .mem-card { aspect-ratio: 1; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #8f6bff); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; transition: transform 0.25s; perspective: 400px; }
+    /* FIX #8: perspective переносим на родителя — иначе rotateY даёт плоское отражение */
+    .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; perspective: 600px; }
+    .mem-card { aspect-ratio: 1; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #8f6bff); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; transition: transform 0.25s; }
     .mem-card.matched { background: #352259; box-shadow: 0 0 0 2px var(--accent) inset; }
     .clicker-btn {
       font-size: 120px; display: inline-block; cursor: pointer; -webkit-user-select: none; user-select: none;
@@ -488,14 +499,14 @@
     }
     .game-end { text-align: center; padding: 20px; }
 
-    /* Модалка */
+    /* FIX #5: модалка больше не «прыгает» из-за transform */
     .modal-bg {
       position: fixed; inset: 0;
       background: rgba(6, 3, 18, 0.62);
       z-index: 45;
       display: flex; align-items: center; justify-content: center;
       padding: 20px;
-      animation: fadeUp 0.25s ease both;
+      animation: fade 0.22s ease both;
     }
     .modal {
       background: #241647;
@@ -511,7 +522,6 @@
     .modal .emo { font-size: 44px; }
     .modal .txt { margin: 12px 0 16px; font-size: 15px; }
 
-    /* Квест */
     .quest-card { text-align: center; }
     .quest-q { font-size: 19px; font-weight: bold; margin: 4px 0 16px; }
     .quest-opt {
@@ -536,7 +546,6 @@
       margin: 10px 0;
     }
 
-    /* Адаптив: на компьютере горизонтальная линия тайм-линии */
     @media (min-width: 640px) {
       .timeline { padding: 46px 0 6px; }
       .tl-line {
@@ -571,11 +580,9 @@
 </head>
 <body>
 
-  <!-- Фон из летающих сердечек -->
   <div class="hearts-bg" id="heartsBg"></div>
 
   <div class="app">
-    <!-- СЕКЦИЯ 3: Верхняя панель -->
     <header class="topbar">Наши 6 месяцев знакомства ❤️</header>
 
     <main id="content">
@@ -598,7 +605,6 @@
           </div>
         </div>
 
-        <!-- Хронология любви -->
         <div class="card" style="margin-bottom: 8px;">
           <h2>⭐ Хронология любви</h2>
           <div class="timeline" id="timeline">
@@ -612,7 +618,8 @@
                 </div>
               </div>
 
-              <div class="tl-gap">26 дней до первого «да»</div>
+              <!-- FIX #2: добавляем id, чтобы обновлять число программно -->
+              <div class="tl-gap" id="tlGap1">26 дней до первого «да»</div>
 
               <div class="tl-point" data-type="start">
                 <div class="tl-dot">❤️</div>
@@ -706,7 +713,6 @@
       </section>
     </main>
 
-    <!-- СЕКЦИЯ 3: Нижняя панель вкладок -->
     <nav class="tabbar">
       <div class="tab active" data-tab="home"><span class="ico">🏠</span>Главная</div>
       <div class="tab" data-tab="kiss"><span class="ico">💋</span>Поцелуйчик</div>
@@ -716,13 +722,10 @@
     </nav>
   </div>
 
-  <!-- Слой для частиц -->
   <div id="fx-layer" style="position:fixed; inset:0; pointer-events:none; z-index:60;"></div>
 
-  <!-- Тост-подсказка -->
   <div id="toast" class="toast hidden"></div>
 
-  <!-- Модалка -->
   <div id="modalBg" class="modal-bg hidden">
     <div class="modal">
       <div class="emo" id="modalEmo">🥺</div>
@@ -731,14 +734,12 @@
     </div>
   </div>
 
-  <!-- Полноэкранный просмотр фото -->
   <div id="photoViewer" class="photo-viewer hidden">
     <img id="pvImg" src="" alt="фото" />
     <div class="cap" id="pvCap"></div>
     <button class="close" id="pvClose">Закрыть ✕</button>
   </div>
 
-  <!-- Квест (оверлей) -->
   <div id="questLayer" class="game-layer hidden">
     <div class="gl-top">
       <button class="btn ghost" id="questBack">⬅️ Назад</button>
@@ -752,7 +753,6 @@
     </div>
   </div>
 
-  <!-- Слой для игр (оверлей) -->
   <div id="gameLayer" class="game-layer hidden">
     <div class="gl-top">
       <button class="btn ghost" id="gameBack">⬅️ К играм</button>
@@ -787,6 +787,7 @@
     const CONST_SUPABASE_KEY = 'ВСТАВЬ_KEY';
     const CONST_DATE_MEET  = '2026-05-13';
     const CONST_DATE_START = '2026-06-08';
+    const SUPABASE_TIMEOUT_MS = 8000;   // FIX #16
 
     const supabaseReady = (CONST_SUPABASE_URL.includes('ВСТАВЬ') === false);
 
@@ -812,6 +813,10 @@
     $('#modalBtn').addEventListener('click', () => {
       $('#modalBg').classList.add('hidden');
       haptic('light');
+    });
+    // FIX #18: закрытие модалки кликом по фону — как в photoViewer
+    $('#modalBg').addEventListener('click', (e) => {
+      if (e.target === $('#modalBg')) $('#modalBg').classList.add('hidden');
     });
 
     /* ============================================================
@@ -850,7 +855,6 @@
       }
     }
 
-    // «Расцветание» для точки «8 июня»: лепестки по кругу + scale/glow
     function spawnBloom(originEl, container) {
       const rect = originEl.getBoundingClientRect();
       const contRect = container.getBoundingClientRect();
@@ -893,9 +897,10 @@
       message: $('#panel-message')
     };
     function switchTab(name) {
+      if (!panels[name]) return;   // FIX #17: защита от неизвестной вкладки
       Object.keys(panels).forEach(k => {
         panels[k].classList.toggle('active', k === name);
-        panels[k].scrollTop = 0;
+        // FIX #10: убрал панельный scrollTop — он всё равно был no-op, скроллится только #content
       });
       document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
       $('#content').scrollTop = 0;
@@ -904,7 +909,9 @@
       if (name === 'message') loadMessage();
     }
     document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+      tab.addEventListener('click', () => {
+        if (tab.dataset.tab) switchTab(tab.dataset.tab);
+      });
     });
 
     /* ============================================================
@@ -923,21 +930,26 @@
       return 'дней';
     }
     function initCounters() {
-      const meet = daysBetween(CONST_DATE_MEET);
-      const start = daysBetween(CONST_DATE_START);
+      // FIX #1: защита от дат в будущем (иначе счётчик показывал −N)
+      const meet  = Math.max(0, daysBetween(CONST_DATE_MEET));
+      const start = Math.max(0, daysBetween(CONST_DATE_START));
       $('#daysMeet').textContent = meet;
       $('#daysStart').textContent = start;
       $('#tlTogether').textContent = `вместе ${start} ${wordDays(start)}`;
+
+      // FIX #2: gap считается из дат, а не захардкожен
+      const gap = Math.max(0, start - meet);
+      const gapEl = $('#tlGap1');
+      if (gapEl) gapEl.textContent = gap + ' ' + wordDays(gap) + ' до первого «да»';
     }
 
-    let timelineAnimating = false; // антиспам на 1 сек
+    let timelineAnimating = false;
     function initTimeline() {
       const points = document.querySelectorAll('.tl-point');
       points.forEach((pt, i) => {
         pt.style.animationDelay = (0.15 * i) + 's';
       });
-      // Каскадное появление
-      points.forEach((pt, i) => {
+      points.forEach((pt) => {
         pt.addEventListener('click', () => {
           if (timelineAnimating) return;
           const type = pt.dataset.type;
@@ -969,7 +981,6 @@
       });
     }
 
-    // Кнопки-плитки
     $('#btnQuest').addEventListener('click', () => openQuest());
     $('#btnSweet').addEventListener('click', () => switchTab('kiss'));
 
@@ -978,14 +989,22 @@
        ============================================================ */
     async function supabaseFetch(path) {
       if (!supabaseReady) throw new Error('no supabase');
-      const res = await fetch(CONST_SUPABASE_URL + '/rest/v1/' + path, {
-        headers: {
-          apikey: CONST_SUPABASE_KEY,
-          Authorization: 'Bearer ' + CONST_SUPABASE_KEY
-        }
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
+      // FIX #16: таймаут, чтобы не висеть в лоадере бесконечно
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), SUPABASE_TIMEOUT_MS);
+      try {
+        const res = await fetch(CONST_SUPABASE_URL + '/rest/v1/' + path, {
+          headers: {
+            apikey: CONST_SUPABASE_KEY,
+            Authorization: 'Bearer ' + CONST_SUPABASE_KEY
+          },
+          signal: controller.signal
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      } finally {
+        clearTimeout(timer);
+      }
     }
     async function saveScore(game, score) {
       if (!supabaseReady) return;
@@ -1057,7 +1076,6 @@
         if (questStep < questData.length - 1) {
           setTimeout(() => { questStep++; renderQuest(); }, 500);
         } else {
-          // Квест пройден -> показать послание
           setTimeout(() => {
             $('#questLayer').classList.add('hidden');
             switchTab('message');
@@ -1097,11 +1115,9 @@
       localStorage.setItem('kissCount', kissCount);
       renderKiss();
 
-      // всплывающее сообщение
       const msg = $('#kissMsg');
       msg.innerHTML = '<div class="kiss-msg">' + kissMessages[Math.floor(Math.random() * kissMessages.length)] + '</div>';
 
-      // 10% шанс «большой поцелуй»
       const big = Math.random() < 0.10;
       const heart = $('#kissHeart');
       heart.classList.add('super');
@@ -1116,22 +1132,34 @@
         spawnParticles(heart, fxLayer, emojis, 8 + Math.floor(Math.random() * 8));
       }
 
-      // фон вспыхивает розовым на 0.3 сек
       document.body.classList.add('flash');
       setTimeout(() => document.body.classList.remove('flash'), 300);
 
-      // сохранить счёт в Supabase (дебаунс)
       scheduleKissSave();
     });
     let kissSaveTimer = null;
     function scheduleKissSave() {
       clearTimeout(kissSaveTimer);
-      kissSaveTimer = setTimeout(() => saveScore('kiss', kissCount), 1500);
+      kissSaveTimer = setTimeout(() => {
+        kissSaveTimer = null;
+        saveScore('kiss', kissCount);
+      }, 1500);
     }
+    // FIX #11: сохраняем при уходе со страницы, чтобы не терять последние клики
+    window.addEventListener('pagehide', () => {
+      if (kissSaveTimer) {
+        clearTimeout(kissSaveTimer);
+        kissSaveTimer = null;
+        saveScore('kiss', kissCount);
+      }
+    });
+
     $('#btnShareKiss').addEventListener('click', () => {
       haptic('medium');
-      if (tg) {
-        try { tg.sendData(JSON.stringify({ type: 'kiss', count: kissCount })); } catch (e) {}
+      // FIX #4: sendData молча не работает в inline-режиме — предупреждаем в консоль
+      if (tg && typeof tg.sendData === 'function' && tg.initData) {
+        try { tg.sendData(JSON.stringify({ type: 'kiss', count: kissCount })); }
+        catch (e) { console.warn('sendData failed:', e); }
       }
       toast('Поцелуй отправлен! 😘', 1600);
     });
@@ -1142,19 +1170,29 @@
     let photosLoaded = false;
     async function loadGallery() {
       if (photosLoaded) return;
-      photosLoaded = true;
       $('#galleryLoader').classList.remove('hidden');
       $('#galleryEmpty').classList.add('hidden');
       try {
         const photos = await supabaseFetch('photos?select=*&order=created_at.desc');
         renderPhotos(photos || []);
         renderPhotoOfDay(photos || []);
+        photosLoaded = true;    // FIX #3: ставим флаг только после успеха
       } catch (e) {
+        // FIX #3: при ошибке показываем пусто, но НЕ блокируем повторную загрузку
         renderPhotos([]);
       } finally {
         $('#galleryLoader').classList.add('hidden');
       }
     }
+
+    // FIX #15: делегированный обработчик error в capture-фазе — работает и для innerHTML
+    $('#photoGrid').addEventListener('error', (e) => {
+      if (e.target && e.target.tagName === 'IMG') e.target.style.opacity = '0.2';
+    }, true);
+    $('#photoDay').addEventListener('error', (e) => {
+      if (e.target && e.target.tagName === 'IMG') e.target.style.opacity = '0.2';
+    }, true);
+
     function renderPhotos(photos) {
       const grid = $('#photoGrid');
       grid.innerHTML = '';
@@ -1166,7 +1204,7 @@
         const card = document.createElement('div');
         card.className = 'photo-card';
         card.style.animationDelay = (i * 0.06) + 's';
-        card.innerHTML = '<img src="' + (p.url || '') + '" alt="" loading="lazy" onerror="this.style.opacity=0.2">' +
+        card.innerHTML = '<img src="' + (p.url || '') + '" alt="" loading="lazy">' +
           '<div class="cap">' + (p.caption || '❤️') + '</div>';
         card.addEventListener('click', () => openViewer(p.url, p.caption));
         grid.appendChild(card);
@@ -1178,12 +1216,16 @@
       $('#pvCap').textContent = cap || '';
       $('#photoViewer').classList.remove('hidden');
     }
-    $('#pvClose').addEventListener('click', () => $('#photoViewer').classList.add('hidden'));
+    // FIX #12: очищаем src при закрытии
+    function closeViewer() {
+      $('#photoViewer').classList.add('hidden');
+      $('#pvImg').src = '';
+    }
+    $('#pvClose').addEventListener('click', closeViewer);
     $('#photoViewer').addEventListener('click', (e) => {
-      if (e.target === $('#photoViewer')) $('#photoViewer').classList.add('hidden');
+      if (e.target === $('#photoViewer')) closeViewer();
     });
 
-    // Фото дня
     function todayKey() {
       const d = new Date();
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -1197,16 +1239,24 @@
       try { saved = JSON.parse(localStorage.getItem('photoDay') || 'null'); } catch (e) {}
       let photo;
       if (saved && saved.key === key) {
-        photo = photos.find(p => (p.id === saved.id)) || photos[0];
+        // FIX #13: страхуемся — ищем сначала по url, потом по id, потом берём первую
+        photo = photos.find(p => p.url && p.url === saved.url)
+             || photos.find(p => p.id && p.id === saved.id)
+             || photos[0];
       } else {
         const seed = key.split('-').join('');
         const idx = parseInt(seed, 10) % photos.length;
         photo = photos[idx];
-        localStorage.setItem('photoDay', JSON.stringify({ key: key, id: photo.id }));
       }
+      // FIX #13: сохраняем и id, и url — на случай если id окажется null/undefined
+      localStorage.setItem('photoDay', JSON.stringify({
+        key: key,
+        id: photo.id || null,
+        url: photo.url || null
+      }));
       box.innerHTML =
         '<div class="photo-day">' +
-          '<img src="' + (photo.url || '') + '" alt="" onerror="this.style.opacity=0.2">' +
+          '<img src="' + (photo.url || '') + '" alt="">' +
           '<div class="pd-txt">' +
             '<div class="pd-title">📸 Фото дня</div>' +
             '<div class="pd-timer" id="pdTimer"></div>' +
@@ -1217,6 +1267,7 @@
     }
     function startDayTimer() {
       const el = $('#pdTimer');
+      if (!el) return;
       function tick() {
         const now = new Date();
         const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -1245,12 +1296,13 @@
         openGame(card.dataset.game);
       });
     });
-    $('#gameBack').addEventListener('click', (e) => {
+    $('#gameBack').addEventListener('click', () => {
       closeGame();
       switchTab('games');
     });
 
     function openGame(name) {
+      closeGame();
       $('#gameLayer').classList.remove('hidden');
       const titles = { dino: '🦖 Динозаврик', block: '🧱 Блок-бласт', memory: '🃏 Найди пару', clicker: '💋 Кликер' };
       $('#gameTitle').textContent = titles[name];
@@ -1262,7 +1314,8 @@
       else if (name === 'clicker') startClicker();
     }
     function closeGame() {
-      // останавливаем все игровые циклы
+      if (window._dinoCleanup) window._dinoCleanup();
+      if (window._blockCleanup) window._blockCleanup();
       if (window._dinoRaf) { cancelAnimationFrame(window._dinoRaf); window._dinoRaf = null; }
       if (window._clickerTimer) { clearInterval(window._clickerTimer); window._clickerTimer = null; }
       $('#gameLayer').classList.add('hidden');
@@ -1291,7 +1344,9 @@
         '<p class="empty-note">Тапни или нажми пробел, чтобы прыгнуть 💕</p>';
       const canvas = $('#dinoCanvas');
       const ctx = canvas.getContext('2d');
-      const W = canvas.parentElement.clientWidth - 0;
+      const scoreEl = $('#gameScore');
+      // FIX #9: W теперь let, чтобы обновлять при ресайзе/повороте
+      let W = canvas.parentElement.clientWidth;
       canvas.width = W;
       canvas.height = 280;
 
@@ -1299,6 +1354,8 @@
       const groundY = 240;
       let obstacles = [];
       let score = 0, speed = 5, frame = 0, over = false;
+      let lastTime = null, accumulator = 0, spawnFrames = 0, lastScore = -1;
+      const step = 1000 / 60;
 
       function reset() {
         dino.y = groundY - dino.h; dino.vy = 0;
@@ -1310,50 +1367,102 @@
         if (over) return;
         if (dino.y >= groundY - dino.h) { dino.vy = -13; haptic('light'); }
       }
-      canvas.addEventListener('pointerdown', jump);
-      window.addEventListener('keydown', function kh(e) {
-        if (e.code === 'Space') { e.preventDefault(); jump(); }
-      });
+      function onPointer(e) { e.preventDefault(); jump(); }
+      function onKey(e) {
+        if (e.code === 'Space') { e.preventDefault(); if (!e.repeat) jump(); }
+      }
+      function onVisibility() { lastTime = null; accumulator = 0; }
+      // FIX #9: ресайз канваса при повороте/смене размера
+      function onResize() {
+        const newW = canvas.parentElement.clientWidth;
+        if (newW > 0 && newW !== W) {
+          W = newW;
+          canvas.width = newW;
+        }
+      }
+      function cleanup() {
+        over = true;
+        cancelAnimationFrame(window._dinoRaf);
+        window._dinoRaf = null;
+        canvas.removeEventListener('pointerdown', onPointer);
+        window.removeEventListener('keydown', onKey);
+        document.removeEventListener('visibilitychange', onVisibility);
+        window.removeEventListener('resize', onResize);
+        window._dinoCleanup = null;
+      }
+      window._dinoCleanup = cleanup;
+      canvas.style.touchAction = 'none';
+      canvas.addEventListener('pointerdown', onPointer);
+      window.addEventListener('keydown', onKey);
+      document.addEventListener('visibilitychange', onVisibility);
+      window.addEventListener('resize', onResize);
+
+      function drawDino() {
+        const stride = dino.y >= groundY - dino.h ? Math.floor(frame / 6) % 2 : 0;
+        ctx.save();
+        ctx.translate(dino.x, dino.y);
+        ctx.fillStyle = '#a5e878';
+        ctx.fillRect(19, 0, 21, 18);
+        ctx.fillRect(15, 12, 15, 17);
+        ctx.fillRect(7, 20, 20, 12);
+        ctx.fillRect(2, 15, 6, 12);
+        ctx.fillRect(0, 11, 3, 9);
+        ctx.fillRect(27, 22, 7, 4);
+        ctx.fillRect(10, 30, 5, stride ? 6 : 10);
+        ctx.fillRect(10, stride ? 33 : 37, 9, 3);
+        ctx.fillRect(21, 30, 5, stride ? 10 : 6);
+        ctx.fillRect(21, stride ? 37 : 33, 9, 3);
+        ctx.fillStyle = '#18232d';
+        ctx.fillRect(32, 4, 3, 3);
+        ctx.fillRect(31, 13, 9, 2);
+        ctx.fillStyle = '#ff8cbb';
+        ctx.fillRect(28, 9, 4, 3);
+        ctx.restore();
+      }
 
       function spawnObs() {
         const o = { x: W + 20, y: groundY - 30, w: 22, h: 30, type: Math.random() < 0.5 ? '🌵' : '💔' };
         obstacles.push(o);
       }
-      function loop() {
+      function loop(now) {
         if (over) return;
+        if (lastTime === null) lastTime = now;
+        accumulator += Math.min(now - lastTime, 100);
+        lastTime = now;
+        while (accumulator >= step && !over) {
+          accumulator -= step;
+          dino.vy += 0.8; dino.y += dino.vy;
+          if (dino.y >= groundY - dino.h) { dino.y = groundY - dino.h; dino.vy = 0; }
+          frame++;
+          score = Math.floor(frame / 6);
+          speed = Math.min(12, 5 + score * 0.05);
+          if (++spawnFrames >= Math.max(38, Math.floor(80 - score))) {
+            spawnFrames = 0;
+            spawnObs();
+          }
+          obstacles = obstacles.filter(o => o.x > -40);
+          obstacles.forEach(o => {
+            o.x -= speed;
+            if (dino.x + 5 < o.x + o.w && dino.x + dino.w - 4 > o.x &&
+                dino.y + dino.h - 2 > o.y && dino.y + 3 < o.y + o.h) over = true;
+          });
+        }
         ctx.clearRect(0, 0, W, canvas.height);
-
-        // земля
         ctx.fillStyle = '#8f6bff';
         ctx.fillRect(0, groundY, W, 4);
-
-        // динозавр
-        dino.vy += 0.8; dino.y += dino.vy;
-        if (dino.y >= groundY - dino.h) { dino.y = groundY - dino.h; dino.vy = 0; }
-        ctx.font = '40px "Segoe UI Emoji", "Comic Sans MS", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('🦖', dino.x + dino.w / 2, dino.y + dino.h - 6);
-
-        // кактусы
-        frame++;
-        if (frame % Math.max(30, Math.floor(80 - score)) === 0) spawnObs();
-        obstacles = obstacles.filter(o => o.x > -40);
+        drawDino();
         obstacles.forEach(o => {
-          o.x -= speed;
           ctx.font = '30px "Segoe UI Emoji", "Comic Sans MS", sans-serif';
+          ctx.textAlign = 'center';
           ctx.fillText(o.type, o.x + o.w / 2, o.y + 26);
-          // коллизия
-          const dx = (dino.x + dino.w / 2) - (o.x + o.w / 2);
-          const dy = (dino.y + dino.h / 2) - (o.y + 15);
-          if (Math.abs(dx) < 26 && Math.abs(dy) < 26) { over = true; }
         });
-
-        score = Math.floor(frame / 6);
-        speed = Math.min(12, 5 + score * 0.05);
-        $('#gameScore').textContent = 'Счёт: ' + score;
-
+        if (score !== lastScore) {
+          scoreEl.textContent = 'Счёт: ' + score;
+          lastScore = score;
+        }
         if (!over) { window._dinoRaf = requestAnimationFrame(loop); }
         else {
+          cleanup();
           haptic('heavy');
           body.innerHTML = '<div class="game-end" id="dinoEnd"></div>';
           gameEnd('🦖 Динозаврик', score, 'dino', $('#dinoEnd'));
@@ -1365,69 +1474,162 @@
     /* --- Блок-бласт --- */
     function startBlock() {
       const body = $('#gameBody');
-      body.innerHTML = '<div class="grid-5" id="blockGrid"></div>' +
-        '<p class="empty-note">Заполняй ряды 💖, чтобы линия сгорала ✨</p>';
+      body.innerHTML = '<div class="block-board" id="blockGrid" aria-label="Поле 8 на 8"></div>' +
+        '<p class="block-hint" id="blockHint">Выбери фигуру, затем её верхний левый угол на поле</p>' +
+        '<div class="block-tray" id="blockTray"></div>' +
+        '<div style="text-align:center;margin-top:14px"><button class="btn ghost" id="blockDone">Завершить игру</button></div>';
       const grid = $('#blockGrid');
-      let cells = [];
-      let score = 0;
-      function renderGrid() {
-        grid.innerHTML = '';
-        for (let i = 0; i < 25; i++) {
-          const c = document.createElement('div');
-          c.className = 'cell' + (cells[i] ? ' filled' : '');
-          c.textContent = cells[i] ? '💖' : '';
-          c.addEventListener('click', () => place(i, c));
-          grid.appendChild(c);
-        }
+      const tray = $('#blockTray');
+      const hint = $('#blockHint');
+      const shapes = [
+        [[0,0],[0,1],[0,2],[0,3]],
+        [[0,0],[1,0],[2,0],[3,0]],
+        [[0,0],[0,1],[1,0],[1,1]],
+        [[0,0],[0,1],[0,2],[1,1]],
+        [[0,1],[1,0],[1,1],[2,1]],
+        [[0,0],[1,0],[2,0],[2,1]],
+        [[0,1],[1,1],[2,0],[2,1]],
+        [[0,0],[1,0],[1,1],[1,2]],
+        [[0,0],[0,1],[0,2],[1,0]],
+        [[0,1],[0,2],[1,0],[1,1]],
+        [[0,0],[0,1],[1,1],[1,2]],
+        [[0,0],[1,0],[1,1],[2,1]],
+        [[0,1],[1,0],[1,1],[2,0]]
+      ];
+      let cells = Array(64).fill(false), pieces = [], selected = -1;
+      let score = 0, locked = false, finished = false, clearTimer = null;
+      const tiles = [];
+      function canPlace(shape, anchor) {
+        const r = Math.floor(anchor / 8), c = anchor % 8;
+        return shape.every(([dr,dc]) => r + dr < 8 && c + dc < 8 && !cells[(r+dr)*8+c+dc]);
       }
-      function checkLines() {
-        const burnSet = new Set();
-        for (let r = 0; r < 5; r++) {
-          const row = [0,1,2,3,4].map(c => r*5+c);
-          if (row.every(i => cells[i])) row.forEach(i => burnSet.add(i));
-        }
-        for (let c = 0; c < 5; c++) {
-          const col = [0,1,2,3,4].map(r => r*5+c);
-          if (col.every(i => cells[i])) col.forEach(i => burnSet.add(i));
-        }
-        return burnSet;
+      function hasMove(shape) {
+        return cells.some((_,i) => canPlace(shape,i));
       }
-      function place(i, cellEl) {
-        if (cells[i]) return;
-        cells[i] = true;
-        cellEl.classList.add('filled');
-        cellEl.textContent = '💖';
-        cellEl.classList.add('popIn');
-        haptic('light');
-        const burnSet = checkLines();
-        if (burnSet.size > 0) {
-          haptic('medium');
-          const elMap = {};
-          grid.querySelectorAll('.cell').forEach(el => elMap[el.dataset.i] = el);
-          burnSet.forEach(idx => {
-            grid.children[idx].classList.add('burn');
-            cells[idx] = false;
-          });
-          const lines = burnSet.size >= 5 ? Math.floor(burnSet.size / 5) : burnSet.size;
-          score += burnSet.size * 10;
-          $('#gameScore').textContent = 'Счёт: ' + score;
-          spawnParticles(document.querySelector('.grid-5'), fxLayer, ['💖','✨','💕'], Math.min(12, burnSet.size));
-          setTimeout(renderGrid, 520);
-        }
+      function clearPreview() {
+        tiles.forEach(el => el.classList.remove('preview','invalid'));
       }
-      // проставить data-i
-      setTimeout(() => {
-        grid.querySelectorAll('.cell').forEach((el, i) => el.dataset.i = i);
-      }, 0);
-      renderGrid();
-      $('#gameScore').textContent = 'Счёт: 0';
-      // кнопка завершить
-      body.insertAdjacentHTML('beforeend',
-        '<div style="text-align:center;margin-top:14px;"><button class="btn" id="blockDone">Готово 💖</button></div>');
-      $('#blockDone').addEventListener('click', () => {
+      function preview(anchor) {
+        clearPreview();
+        if (selected < 0 || !pieces[selected] || locked) return;
+        const shape = pieces[selected], valid = canPlace(shape,anchor);
+        const r = Math.floor(anchor/8), c = anchor%8;
+        shape.forEach(([dr,dc]) => {
+          if (r+dr < 8 && c+dc < 8) tiles[(r+dr)*8+c+dc].classList.add(valid ? 'preview' : 'invalid');
+        });
+      }
+      function paint() {
+        clearPreview();
+        tiles.forEach((el,i) => {
+          el.className = 'block-cell' + (cells[i] ? ' filled' : '');
+          el.setAttribute('aria-label', 'Ряд ' + (Math.floor(i/8)+1) + ', столбец ' + (i%8+1) + (cells[i] ? ', занято' : ', свободно'));
+        });
+        $('#gameScore').textContent = 'Счёт: ' + score;
+      }
+      function renderTray() {
+        tray.innerHTML = '';
+        pieces.forEach((shape,i) => {
+          const btn = document.createElement('button');
+          btn.className = 'block-piece' + (i === selected ? ' selected' : '');
+          btn.disabled = !shape;
+          btn.setAttribute('aria-label', shape ? 'Фигура ' + (i+1) : 'Фигура использована');
+          btn.setAttribute('aria-pressed', String(i === selected));
+          if (shape) {
+            const rows = Math.max(...shape.map(p=>p[0]))+1;
+            const cols = Math.max(...shape.map(p=>p[1]))+1;
+            const mini = document.createElement('span');
+            mini.className = 'block-mini';
+            mini.style.gridTemplateColumns = 'repeat(' + cols + ', 16px)';
+            for (let r=0;r<rows;r++) for(let c=0;c<cols;c++) {
+              const pixel = document.createElement('span');
+              pixel.className = 'block-pixel' + (shape.some(p=>p[0]===r && p[1]===c) ? ' filled' : '');
+              mini.appendChild(pixel);
+            }
+            btn.appendChild(mini);
+            btn.addEventListener('click', () => {
+              if (locked || finished) return;
+              selected = i;
+              clearPreview();
+              renderTray();
+              hint.textContent = 'Нажми на поле: здесь будет верхний левый угол фигуры';
+              haptic('light');
+            });
+          } else btn.textContent = '✓';
+          tray.appendChild(btn);
+        });
+      }
+      function finish() {
+        if (finished) return;
+        finished = true;
+        cleanup();
         body.innerHTML = '<div class="game-end" id="blockEnd"></div>';
-        gameEnd('🧱 Блок-бласт', score, 'block', $('#blockEnd'));
-      });
+        gameEnd('🧱 Блок-бласт',score,'block',$('#blockEnd'));
+      }
+      function cleanup() {
+        finished = true;
+        clearTimeout(clearTimer);
+        window._blockCleanup = null;
+      }
+      window._blockCleanup = cleanup;
+      function nextTurn() {
+        if (finished) return;
+        locked = false;
+        if (pieces.every(p=>!p)) pieces = Array.from({length:3},()=>shapes[Math.floor(Math.random()*shapes.length)]);
+        selected = pieces.findIndex(p=>p && hasMove(p));
+        paint();
+        renderTray();
+        if (selected < 0) { finish(); return; }
+        hint.textContent = 'Выбери фигуру и поставь её на поле. Заполняй строки и столбцы!';
+      }
+      function place(anchor) {
+        if (locked || finished || selected < 0) return;
+        const shape = pieces[selected];
+        if (!shape || !canPlace(shape,anchor)) {
+          preview(anchor);
+          hint.textContent = 'Здесь фигура не помещается. Выбери другое место или фигуру';
+          return;
+        }
+        const r = Math.floor(anchor/8), c = anchor%8;
+        shape.forEach(([dr,dc])=>cells[(r+dr)*8+c+dc]=true);
+        score += shape.length;
+        pieces[selected] = null;
+        selected = -1;
+        haptic('light');
+        const burn = new Set();
+        let lines = 0;
+        for(let n=0;n<8;n++) {
+          const row = Array.from({length:8},(_,i)=>n*8+i);
+          const col = Array.from({length:8},(_,i)=>i*8+n);
+          for(const line of [row,col]) if(line.every(i=>cells[i])) {
+            lines++;
+            line.forEach(i=>burn.add(i));
+          }
+        }
+        score += lines * 80;
+        paint();
+        renderTray();
+        if (burn.size) {
+          locked = true;
+          haptic('medium');
+          burn.forEach(i=>tiles[i].classList.add('burn'));
+          clearTimer = setTimeout(()=> {
+            burn.forEach(i=>cells[i]=false);
+            nextTurn();
+          },350);
+        } else nextTurn();
+      }
+      for(let i=0;i<64;i++) {
+        const el = document.createElement('button');
+        el.className = 'block-cell';
+        el.addEventListener('click',()=>place(i));
+        el.addEventListener('pointerenter',()=>preview(i));
+        el.addEventListener('focus',()=>preview(i));
+        tiles.push(el);
+        grid.appendChild(el);
+      }
+      grid.addEventListener('pointerleave',clearPreview);
+      $('#blockDone').addEventListener('click',finish);
+      nextTurn();
     }
 
     /* --- Найди пару --- */
@@ -1463,7 +1665,8 @@
               haptic('medium');
               opened = []; lock = false;
               if (matched === 6) {
-                const score = Math.max(1, Math.round(100 - moves * 2));
+                // FIX #14: нормируем так, чтобы идеальные 6 ходов = 100
+                const score = Math.max(1, Math.round(100 * 6 / Math.max(6, moves)));
                 body.innerHTML = '<div class="game-end" id="memEnd"></div>';
                 gameEnd('🃏 Найди пару', score, 'memory', $('#memEnd'));
               }
@@ -1509,10 +1712,10 @@
        ============================================================ */
     function initHearts() {
       const bg = $('#heartsBg');
-      const emos = ['❤️', '💖', '✨', '⭐', '💫', '🌟', '💜'];
+      const emojis = ['❤️', '💖', '✨', '⭐', '💫', '🌟', '💜'];
       for (let i = 0; i < 16; i++) {
         const s = document.createElement('span');
-        s.textContent = emos[Math.floor(Math.random() * emos.length)];
+        s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
         s.style.left = (Math.random() * 100) + 'vw';
         s.style.fontSize = (16 + Math.random() * 18) + 'px';
         s.style.animationDuration = (8 + Math.random() * 10) + 's';
