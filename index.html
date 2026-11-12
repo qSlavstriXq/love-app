@@ -5,13 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Наши 6 месяцев ❤️</title>
 
-  <!-- СЕКЦИЯ 1: Официальный SDK Telegram WebApp -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
-    /* ============================================================
-       СЕКЦИЯ 2: ДИЗАЙН (космический градиент)
-       ============================================================ */
     :root {
       --pink: #9d54b3;
       --marshmallow: #2e1b56;
@@ -40,20 +36,10 @@
       position: relative;
     }
 
-    /* Летающие сердечки на заднем плане */
-    .hearts-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-      overflow: hidden;
-    }
+    .hearts-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
     .hearts-bg span {
-      position: absolute;
-      bottom: -8vh;
-      color: rgba(165, 85, 220, 0.35);
-      font-size: 22px;
-      /* FIX #20: добавил 12s fallback на случай, если JS не отработает */
+      position: absolute; bottom: -8vh;
+      color: rgba(165, 85, 220, 0.35); font-size: 22px;
       animation: floatUp 12s linear infinite;
       will-change: transform, opacity;
     }
@@ -64,59 +50,32 @@
       100% { transform: translateY(-115vh) rotate(-15deg) scale(0.9); opacity: 0; }
     }
 
-    .particle {
-      position: absolute;
-      pointer-events: none;
-      user-select: none;
-      z-index: 10;
-      will-change: transform, opacity;
-    }
+    .particle { position: absolute; pointer-events: none; user-select: none; z-index: 10; will-change: transform, opacity; }
 
     .app {
-      position: relative;
-      z-index: 1;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      max-width: 560px;
-      margin: 0 auto;
+      position: relative; z-index: 1; height: 100%;
+      display: flex; flex-direction: column; max-width: 560px; margin: 0 auto;
     }
 
     .topbar {
-      padding: 14px 18px;
-      text-align: center;
-      font-size: 17px;
-      font-weight: bold;
-      color: var(--dark);
-      background: rgba(18, 10, 36, 0.72);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(165, 85, 220, 0.25);
-      letter-spacing: 0.3px;
-      flex-shrink: 0;
+      padding: 14px 18px; text-align: center; font-size: 17px; font-weight: bold;
+      color: var(--dark); background: rgba(18, 10, 36, 0.72);
+      backdrop-filter: blur(8px); border-bottom: 1px solid rgba(165, 85, 220, 0.25);
+      letter-spacing: 0.3px; flex-shrink: 0;
     }
 
     main {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 14px 90px;
-      position: relative;
-      -webkit-overflow-scrolling: touch;
+      flex: 1; overflow-y: auto; padding: 16px 14px 90px;
+      position: relative; -webkit-overflow-scrolling: touch;
     }
 
     .panel { display: none; }
-    .panel.active {
-      display: block;
-      animation: fadeUp 0.4s ease both;
-    }
+    .panel.active { display: block; animation: fadeUp 0.4s ease both; }
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    /* FIX #5: отдельный fade только для полноэкранных оверлеев */
-    @keyframes fade {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popIn {
       0%   { opacity: 0; transform: scale(0.8); }
       60%  { transform: scale(1.05); }
@@ -124,13 +83,9 @@
     }
 
     .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 18px;
-      margin-bottom: 14px;
-      backdrop-filter: blur(6px);
-      animation: fadeUp 0.5s ease both;
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px; margin-bottom: 14px;
+      backdrop-filter: blur(6px); animation: fadeUp 0.5s ease both;
     }
 
     h1 { font-size: 26px; text-align: center; margin: 8px 0 6px; }
@@ -139,100 +94,56 @@
 
     .counters { display: flex; gap: 12px; margin-bottom: 14px; }
     .counter-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 18px;
-      text-align: center;
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px; text-align: center;
       animation: fadeUp 0.5s ease both;
     }
     .counter-card.big { flex: 1.6; background: linear-gradient(135deg, #3a2460, var(--marshmallow)); }
     .counter-card.small { flex: 1; }
-    .counter-num {
-      font-size: 40px;
-      font-weight: bold;
-      color: var(--accent);
-      line-height: 1;
-      margin: 6px 0;
-    }
+    .counter-num { font-size: 40px; font-weight: bold; color: var(--accent); line-height: 1; margin: 6px 0; }
     .counter-card.small .counter-num { font-size: 28px; }
     .counter-label { font-size: 13px; color: #b8a6d6; }
     .counter-dayword { font-size: 12px; color: #9d8ac7; }
 
-    .timeline {
-      position: relative;
-      padding: 6px 0 4px;
-    }
+    .timeline { position: relative; padding: 6px 0 4px; }
     .tl-line {
-      position: absolute;
-      left: 31.5px;
-      top: 18px;
-      bottom: 18px;
-      width: 5px;
-      background: linear-gradient(180deg, var(--pink), var(--accent));
-      border-radius: 6px;
+      position: absolute; left: 31.5px; top: 18px; bottom: 18px; width: 5px;
+      background: linear-gradient(180deg, var(--pink), var(--accent)); border-radius: 6px;
     }
-    .tl-line::before,
-    .tl-line::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 11px;
-      height: 11px;
-      background: var(--accent);
-      border-radius: 50%;
+    .tl-line::before, .tl-line::after {
+      content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+      width: 11px; height: 11px; background: var(--accent); border-radius: 50%;
     }
     .tl-line::before { top: -3px; }
     .tl-line::after { bottom: -3px; }
     .tl-marker {
-      position: absolute;
-      left: 50%;
-      top: 0%;
+      position: absolute; left: 50%; top: 0%;
       transform: translate(-50%, -50%);
-      font-size: 18px;
-      line-height: 1;
+      font-size: 18px; line-height: 1;
       animation: markerY 6s ease-in-out infinite;
       filter: drop-shadow(0 0 6px rgba(255, 107, 179, 0.8));
       z-index: 2;
     }
-    @keyframes markerY {
-      0%   { top: 0%; }
-      50%  { top: 100%; }
-      100% { top: 0%; }
-    }
+    @keyframes markerY { 0% { top: 0%; } 50% { top: 100%; } 100% { top: 0%; } }
     .tl-points { display: flex; flex-direction: column; gap: 9px; }
     .tl-point {
-      position: relative;
-      display: flex; align-items: center;
-      padding: 10px 14px 10px 62px;
-      min-height: 60px;
-      border-radius: 16px;
-      background: rgba(30, 17, 58, 0.42);
-      box-shadow: 0 4px 12px rgba(46, 27, 86, 0.35);
-      cursor: pointer;
+      position: relative; display: flex; align-items: center;
+      padding: 10px 14px 10px 62px; min-height: 60px;
+      border-radius: 16px; background: rgba(30, 17, 58, 0.42);
+      box-shadow: 0 4px 12px rgba(46, 27, 86, 0.35); cursor: pointer;
       animation: fadeUp 0.5s ease both;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .tl-point:active { transform: scale(0.98); }
     .tl-dot {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
       width: 44px; height: 44px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
-      background: #241442;
-      border-radius: 50%;
-      box-shadow: 0 4px 14px rgba(143, 107, 255, 0.5);
-      z-index: 2;
+      font-size: 24px; background: #241442; border-radius: 50%;
+      box-shadow: 0 4px 14px rgba(143, 107, 255, 0.5); z-index: 2;
       transition: box-shadow 0.3s ease;
     }
-    .tl-point.blooming .tl-dot {
-      animation: bloom 1s ease;
-    }
-    /* FIX #6: используем свойство scale (не трогает transform) — работает и на мобиле, и на десктопе */
+    .tl-point.blooming .tl-dot { animation: bloom 1s ease; }
     @keyframes bloom {
       0%   { scale: 1;   box-shadow: 0 0 0 rgba(165,85,220,0); }
       40%  { scale: 1.5; box-shadow: 0 0 30px rgba(165,85,220,0.9); }
@@ -242,45 +153,31 @@
     .tl-label { font-weight: bold; font-size: 15px; }
     .tl-sub { font-size: 12.5px; color: #b8a6d6; }
     .tl-gap {
-      align-self: center;
-      font-size: 12px;
-      color: #c9b8ec;
+      align-self: center; font-size: 12px; color: #c9b8ec;
       background: rgba(30, 17, 58, 0.35);
       border: 1px dashed rgba(165, 85, 220, 0.45);
-      padding: 5px 14px;
-      border-radius: 20px;
-      text-align: center;
+      padding: 5px 14px; border-radius: 20px; text-align: center;
     }
     .tl-badge {
-      align-self: center;
-      font-size: 12px;
-      color: #fff;
+      align-self: center; font-size: 12px; color: #fff;
       background: linear-gradient(90deg, var(--accent), #8f6bff);
-      padding: 6px 16px;
-      border-radius: 20px;
+      padding: 6px 16px; border-radius: 20px;
       box-shadow: 0 4px 12px rgba(165,85,220,0.3);
-      text-align: center;
-      animation: popIn 0.6s ease both;
+      text-align: center; animation: popIn 0.6s ease both;
     }
 
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       background: linear-gradient(135deg, var(--accent), #8f6bff);
-      color: #fff;
-      border: none;
-      border-radius: 18px;
-      padding: 14px 20px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 6px 16px rgba(165,85,220,0.35);
+      color: #fff; border: none; border-radius: 18px;
+      padding: 14px 20px; font-size: 15px; font-weight: bold;
+      cursor: pointer; box-shadow: 0 6px 16px rgba(165,85,220,0.35);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
       font-family: inherit;
     }
     .btn:active { transform: scale(0.95); }
     .btn.ghost {
-      background: rgba(255, 255, 255, 0.08);
-      color: #f1e8ff;
+      background: rgba(255, 255, 255, 0.08); color: #f1e8ff;
       box-shadow: 0 4px 14px rgba(0,0,0,0.25);
       border: 1.5px solid rgba(165, 85, 220, 0.45);
     }
@@ -289,75 +186,43 @@
     .tiles .btn .big { font-size: 26px; }
 
     .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 100px;
-      transform: translateX(-50%);
-      background: #241547;
-      color: var(--dark);
-      padding: 12px 18px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(165,85,220,0.4);
+      position: fixed; left: 50%; bottom: 100px; transform: translateX(-50%);
+      background: #241547; color: var(--dark); padding: 12px 18px;
+      border-radius: 16px; box-shadow: 0 8px 24px rgba(165,85,220,0.4);
       border: 1px solid rgba(165, 85, 220, 0.3);
-      font-size: 14px;
-      z-index: 50;
-      animation: toastIn 0.25s ease both;
-      max-width: 88%;
-      text-align: center;
+      font-size: 14px; z-index: 50; animation: toastIn 0.25s ease both;
+      max-width: 88%; text-align: center;
     }
     @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 8px); } to { opacity: 1; transform: translate(-50%, 0); } }
 
-    /* ============================================================
-       СЕКЦИЯ 3: Нижняя панель вкладок
-       ============================================================ */
     .tabbar {
-      position: fixed;
-      bottom: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 560px;
-      display: flex;
-      background: rgba(16, 9, 32, 0.88);
-      backdrop-filter: blur(10px);
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 560px; display: flex;
+      background: rgba(16, 9, 32, 0.88); backdrop-filter: blur(10px);
       border-top: 1px solid rgba(165,85,220,0.25);
-      padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
-      z-index: 5;
+      padding: 6px 4px calc(6px + env(safe-area-inset-bottom)); z-index: 5;
     }
     .tab {
-      flex: 1;
-      display: flex; flex-direction: column; align-items: center; gap: 2px;
-      padding: 8px 2px;
-      font-size: 11px;
-      color: #9d8ac7;
-      cursor: pointer;
-      border-radius: 14px;
-      transition: color 0.2s, background 0.2s, transform 0.15s;
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 8px 2px; font-size: 11px; color: #9d8ac7; cursor: pointer;
+      border-radius: 14px; transition: color 0.2s, background 0.2s, transform 0.15s;
     }
     .tab .ico { font-size: 22px; line-height: 1; }
     .tab.active { color: var(--accent); background: rgba(165, 85, 220, 0.22); }
     .tab:active { transform: scale(0.92); }
 
-    /* FIX #19: убрал двойной градиент — оставил один ::after на body */
     body.flash::after {
-      content: '';
-      position: fixed; inset: 0;
+      content: ''; position: fixed; inset: 0;
       background: radial-gradient(circle, rgba(165,85,220,0.45), transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
 
-    /* ============================================================
-       СЕКЦИЯ 6: Поцелуйчик
-       ============================================================ */
     .kiss-wrap { text-align: center; padding-top: 10px; }
     .kiss-heart {
-      font-size: 130px;
-      display: inline-block;
-      cursor: pointer;
+      font-size: 130px; display: inline-block; cursor: pointer;
       -webkit-user-select: none; user-select: none;
       animation: heartBeat 1.4s ease-in-out infinite;
-      transition: transform 0.1s ease;
-      line-height: 1;
+      transition: transform 0.1s ease; line-height: 1;
     }
     @keyframes heartBeat {
       0%,100% { transform: scale(1); }
@@ -367,62 +232,41 @@
       70%     { transform: scale(1); }
     }
     .kiss-heart.super { animation: heartSuper 0.5s ease infinite; }
-    @keyframes heartSuper {
-      0%,100% { transform: scale(1); }
-      50%     { transform: scale(1.35); }
-    }
+    @keyframes heartSuper { 0%,100% { transform: scale(1); } 50% { transform: scale(1.35); } }
     .kiss-count { font-size: 20px; font-weight: bold; color: var(--accent); margin: 10px 0 4px; }
     .kiss-hint { color: #b8a6d6; font-size: 14px; margin-bottom: 18px; }
     .kiss-msg {
-      display: inline-block;
-      margin-top: 14px;
-      font-size: 17px;
-      color: var(--dark);
-      background: rgba(36, 20, 71, 0.9);
-      padding: 10px 20px;
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      animation: popIn 0.3s ease both;
+      display: inline-block; margin-top: 14px; font-size: 17px;
+      color: var(--dark); background: rgba(36, 20, 71, 0.9);
+      padding: 10px 20px; border-radius: 18px;
+      box-shadow: var(--shadow); animation: popIn 0.3s ease both;
     }
 
-    /* ============================================================
-       СЕКЦИЯ 7: Галерея
-       ============================================================ */
     .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .photo-card {
-      border-radius: 16px;
-      overflow: hidden;
-      background: rgba(30, 17, 58, 0.5);
-      box-shadow: var(--shadow);
-      cursor: pointer;
-      animation: fadeUp 0.4s ease both;
+      border-radius: 16px; overflow: hidden; background: rgba(30, 17, 58, 0.5);
+      box-shadow: var(--shadow); cursor: pointer; animation: fadeUp 0.4s ease both;
     }
     .photo-card img { width: 100%; height: 150px; object-fit: cover; display: block; }
     .photo-card .cap { padding: 8px 10px; font-size: 12px; color: #b8a6d6; }
     .photo-day {
       display: flex; align-items: center; gap: 12px;
       background: linear-gradient(135deg, #3a2460, var(--peach));
-      border-radius: var(--radius);
-      padding: 12px;
-      margin-bottom: 14px;
+      border-radius: var(--radius); padding: 12px; margin-bottom: 14px;
       box-shadow: var(--shadow);
     }
     .photo-day img { width: 80px; height: 80px; border-radius: 14px; object-fit: cover; }
     .photo-day .pd-txt { flex: 1; }
     .photo-day .pd-title { font-weight: bold; font-size: 14px; }
     .photo-day .pd-timer { font-size: 12px; color: #9d8ac7; }
-    .loader {
-      text-align: center; padding: 30px 0;
-    }
+    .loader { text-align: center; padding: 30px 0; }
     .loader .heart { font-size: 44px; display: inline-block; animation: heartBeat 1s ease infinite; }
     .empty-note { text-align: center; color: #b8a6d6; padding: 30px 16px; font-size: 14px; }
 
     .photo-viewer {
-      position: fixed; inset: 0;
-      background: rgba(8, 4, 22, 0.94);
-      z-index: 40;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      padding: 20px;
+      position: fixed; inset: 0; background: rgba(8, 4, 22, 0.94);
+      z-index: 40; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 20px;
     }
     .photo-viewer img { max-width: 100%; max-height: 78vh; border-radius: 16px; }
     .photo-viewer .cap { color: #fff; margin-top: 14px; font-size: 15px; text-align: center; }
@@ -430,17 +274,11 @@
 
     .hidden { display: none !important; }
 
-    /* ============================================================
-       СЕКЦИЯ 8: Игры
-       ============================================================ */
     .games-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
     .game-card {
       display: flex; align-items: center; gap: 14px;
-      background: var(--card);
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: var(--shadow);
-      cursor: pointer;
+      background: var(--card); border-radius: 18px; padding: 16px;
+      box-shadow: var(--shadow); cursor: pointer;
       transition: transform 0.15s ease;
     }
     .game-card:active { transform: scale(0.97); }
@@ -453,10 +291,8 @@
     .game-layer {
       position: fixed; inset: 0;
       background: linear-gradient(160deg, #120b28 0%, #2b1a4d 60%, #5a256b 100%);
-      z-index: 30;
-      display: flex; flex-direction: column;
-      padding: 12px;
-      overflow-y: auto;
+      z-index: 30; display: flex; flex-direction: column;
+      padding: 12px; overflow-y: auto;
     }
     .game-layer .gl-top {
       display: flex; align-items: center; justify-content: space-between;
@@ -465,57 +301,97 @@
     .game-layer .gl-title { font-weight: bold; font-size: 17px; }
     .game-layer .gl-score { color: var(--accent); font-weight: bold; }
     canvas.dino-canvas {
-      background: rgba(30, 17, 58, 0.55);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      width: 100%;
-      touch-action: manipulation;
+      background: rgba(30, 17, 58, 0.55); border-radius: 16px;
+      box-shadow: var(--shadow); width: 100%; touch-action: manipulation;
     }
-    .block-board { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; padding: 8px; background: rgba(30, 17, 58, 0.75); border-radius: 16px; width: 100%; max-width: 480px; margin: 0 auto; }
-    .block-cell { appearance: none; aspect-ratio: 1; min-width: 0; padding: 0; border: 1px solid rgba(165,85,220,0.15); border-radius: 5px; background: var(--marshmallow); cursor: pointer; touch-action: manipulation; }
-    .block-cell.filled, .block-pixel.filled { background: linear-gradient(135deg, var(--pink), var(--accent)); box-shadow: inset 0 2px 0 rgba(255,255,255,0.25); }
+
+    /* --- BLOCK-BLAST --- */
+    .block-board {
+      display: grid; grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 4px; padding: 8px;
+      background: rgba(30, 17, 58, 0.75);
+      border-radius: 16px; width: 100%; max-width: 480px; margin: 0 auto;
+    }
+    .block-cell {
+      appearance: none; aspect-ratio: 1; min-width: 0; padding: 0;
+      border: 1px solid rgba(165,85,220,0.15); border-radius: 5px;
+      background: var(--marshmallow); touch-action: manipulation;
+    }
+    .block-cell.filled, .block-pixel.filled {
+      background: linear-gradient(135deg, var(--pink), var(--accent));
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.25);
+    }
     .block-cell.preview { background: rgba(165,232,120,0.6); }
     .block-cell.invalid { background: rgba(255,100,120,0.5); }
     .block-cell.burn { animation: burn 0.35s ease both; }
-    .block-cell:focus-visible, .block-piece:focus-visible { outline: 2px solid #a5e878; outline-offset: 2px; }
+
     .block-hint { text-align: center; color: #c9b8ec; font-size: 13px; min-height: 36px; margin: 14px 0; }
-    .block-tray { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; max-width: 480px; margin: auto; }
-    .block-piece { display: flex; align-items: center; justify-content: center; min-height: 100px; padding: 8px 2px; background: var(--card); color: #c9b8ec; border: 2px solid transparent; border-radius: 14px; cursor: pointer; touch-action: manipulation; }
-    .block-piece.selected { border-color: var(--accent); background: rgba(165,85,220,0.25); }
+
+    .block-tray {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px; max-width: 480px; margin: auto;
+      touch-action: none;
+    }
+    .block-piece {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100px; padding: 8px 2px;
+      background: var(--card); color: #c9b8ec;
+      border: 2px solid transparent; border-radius: 14px;
+      cursor: grab; font-family: inherit;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      transition: transform 0.1s ease;
+    }
+    .block-piece.dragging { opacity: 0.3; }
     .block-piece:disabled { opacity: 0.3; cursor: default; }
     .block-mini { display: grid; gap: 3px; pointer-events: none; }
     .block-pixel { width: 16px; height: 16px; border-radius: 3px; }
-    .cell { aspect-ratio: 1; border-radius: 10px; background: var(--marshmallow); display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: transform 0.15s, background 0.2s; }
-    .cell.filled { background: linear-gradient(135deg, var(--pink), var(--accent)); }
-    .cell.burn { animation: burn 0.5s ease both; }
-    @keyframes burn { 0% { transform: scale(1); opacity: 1;} 50% { transform: scale(1.25); opacity: 0.6;} 100% { transform: scale(0); opacity: 0;} }
-    /* FIX #8: perspective переносим на родителя — иначе rotateY даёт плоское отражение */
+
+    .block-ghost {
+      position: fixed; left: 0; top: 0;
+      display: grid; pointer-events: none;
+      z-index: 100; opacity: 0.92;
+      filter: drop-shadow(0 10px 24px rgba(165, 85, 220, 0.7));
+      will-change: left, top;
+    }
+    .block-ghost-cell { border-radius: 5px; background: transparent; }
+    .block-ghost-cell.filled {
+      background: linear-gradient(135deg, var(--pink), var(--accent));
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.25);
+    }
+    body.block-dragging {
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
     .memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; perspective: 600px; }
-    .mem-card { aspect-ratio: 1; border-radius: 14px; background: linear-gradient(135deg, var(--accent), #8f6bff); display: flex; align-items: center; justify-content: center; font-size: 30px; cursor: pointer; transition: transform 0.25s; }
+    .mem-card {
+      aspect-ratio: 1; border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent), #8f6bff);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px; cursor: pointer; transition: transform 0.25s;
+    }
     .mem-card.matched { background: #352259; box-shadow: 0 0 0 2px var(--accent) inset; }
     .clicker-btn {
-      font-size: 120px; display: inline-block; cursor: pointer; -webkit-user-select: none; user-select: none;
+      font-size: 120px; display: inline-block; cursor: pointer;
+      -webkit-user-select: none; user-select: none;
       animation: heartBeat 1s ease infinite;
     }
     .game-end { text-align: center; padding: 20px; }
 
-    /* FIX #5: модалка больше не «прыгает» из-за transform */
     .modal-bg {
-      position: fixed; inset: 0;
-      background: rgba(6, 3, 18, 0.62);
-      z-index: 45;
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-      animation: fade 0.22s ease both;
+      position: fixed; inset: 0; background: rgba(6, 3, 18, 0.62);
+      z-index: 45; display: flex; align-items: center; justify-content: center;
+      padding: 20px; animation: fade 0.22s ease both;
     }
     .modal {
       background: #241647;
       border: 1px solid rgba(165, 85, 220, 0.35);
-      border-radius: 22px;
-      padding: 24px;
-      max-width: 340px;
-      width: 100%;
-      text-align: center;
+      border-radius: 22px; padding: 24px;
+      max-width: 340px; width: 100%; text-align: center;
       box-shadow: 0 16px 40px rgba(0,0,0,0.25);
       animation: popIn 0.3s ease both;
     }
@@ -538,12 +414,8 @@
     .msg-frame {
       background: linear-gradient(135deg, #3a2460, var(--marshmallow));
       border: 2px solid rgba(165, 85, 220, 0.5);
-      border-radius: 20px;
-      padding: 20px;
-      font-size: 15px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      margin: 10px 0;
+      border-radius: 20px; padding: 20px; font-size: 15px;
+      line-height: 1.6; white-space: pre-wrap; margin: 10px 0;
     }
 
     @media (min-width: 640px) {
@@ -553,19 +425,11 @@
         width: auto; height: 6px;
         background: linear-gradient(90deg, var(--pink), var(--accent));
       }
-      .tl-line::before, .tl-line::after {
-        left: auto;
-        top: 50%;
-        transform: translateY(-50%);
-      }
+      .tl-line::before, .tl-line::after { left: auto; top: 50%; transform: translateY(-50%); }
       .tl-line::before { left: -3px; top: 50%; }
       .tl-line::after { left: auto; right: -3px; top: 50%; }
       .tl-marker { top: 50%; left: 0%; transform: translate(-50%, -50%); animation: markerX 7s ease-in-out infinite; }
-      @keyframes markerX {
-        0%   { left: 0%; }
-        50%  { left: 100%; }
-        100% { left: 0%; }
-      }
+      @keyframes markerX { 0% { left: 0%; } 50% { left: 100%; } 100% { left: 0%; } }
       .tl-points { flex-direction: row; flex-wrap: wrap; }
       .tl-point {
         flex: 1 1 0; flex-direction: column; text-align: center;
@@ -587,7 +451,6 @@
 
     <main id="content">
 
-      <!-- ================= СЕКЦИЯ 4: ГЛАВНАЯ ================= -->
       <section class="panel active" id="panel-home">
         <h1>Привет, любимая ❤️</h1>
         <p class="subtitle">6 месяцев с того дня, как мы встретились</p>
@@ -618,7 +481,6 @@
                 </div>
               </div>
 
-              <!-- FIX #2: добавляем id, чтобы обновлять число программно -->
               <div class="tl-gap" id="tlGap1">26 дней до первого «да»</div>
 
               <div class="tl-point" data-type="start">
@@ -650,7 +512,6 @@
         </div>
       </section>
 
-      <!-- ================= СЕКЦИЯ 6: ПОЦЕЛУЙЧИК ================= -->
       <section class="panel" id="panel-kiss">
         <div class="kiss-wrap">
           <h2>💋 Поцелуйчик</h2>
@@ -664,7 +525,6 @@
         </div>
       </section>
 
-      <!-- ================= СЕКЦИЯ 7: ГАЛЕРЕЯ ================= -->
       <section class="panel" id="panel-gallery">
         <div id="photoDay"></div>
         <div id="photoGrid" class="photo-grid"></div>
@@ -672,7 +532,6 @@
         <div id="galleryEmpty" class="empty-note hidden">Пока здесь только наши будущие воспоминания ❤️</div>
       </section>
 
-      <!-- ================= СЕКЦИЯ 8: ИГРЫ ================= -->
       <section class="panel" id="panel-games">
         <h2 style="margin-bottom:14px;">🎮 Игры для нас</h2>
         <div class="games-grid">
@@ -683,7 +542,7 @@
           </div>
           <div class="game-card" data-game="block">
             <div class="game-ico">🧱</div>
-            <div class="game-info"><div class="game-name">Блок-бласт</div><div class="game-desc">Собирай линии и сжигай их 💖</div></div>
+            <div class="game-info"><div class="game-name">Блок-бласт</div><div class="game-desc">Перетаскивай фигуры на поле 💖</div></div>
             <div class="game-best" id="best-block"></div>
           </div>
           <div class="game-card" data-game="memory">
@@ -699,7 +558,6 @@
         </div>
       </section>
 
-      <!-- ================= СЕКЦИЯ 9: ПОСЛАНИЕ ================= -->
       <section class="panel" id="panel-message">
         <h2>💌 Послание</h2>
         <p class="subtitle">Послание от меня прямо сейчас:</p>
@@ -787,7 +645,7 @@
     const CONST_SUPABASE_KEY = 'ВСТАВЬ_KEY';
     const CONST_DATE_MEET  = '2026-05-13';
     const CONST_DATE_START = '2026-06-08';
-    const SUPABASE_TIMEOUT_MS = 8000;   // FIX #16
+    const SUPABASE_TIMEOUT_MS = 8000;
 
     const supabaseReady = (CONST_SUPABASE_URL.includes('ВСТАВЬ') === false);
 
@@ -814,7 +672,6 @@
       $('#modalBg').classList.add('hidden');
       haptic('light');
     });
-    // FIX #18: закрытие модалки кликом по фону — как в photoViewer
     $('#modalBg').addEventListener('click', (e) => {
       if (e.target === $('#modalBg')) $('#modalBg').classList.add('hidden');
     });
@@ -897,10 +754,9 @@
       message: $('#panel-message')
     };
     function switchTab(name) {
-      if (!panels[name]) return;   // FIX #17: защита от неизвестной вкладки
+      if (!panels[name]) return;
       Object.keys(panels).forEach(k => {
         panels[k].classList.toggle('active', k === name);
-        // FIX #10: убрал панельный scrollTop — он всё равно был no-op, скроллится только #content
       });
       document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
       $('#content').scrollTop = 0;
@@ -930,14 +786,11 @@
       return 'дней';
     }
     function initCounters() {
-      // FIX #1: защита от дат в будущем (иначе счётчик показывал −N)
       const meet  = Math.max(0, daysBetween(CONST_DATE_MEET));
       const start = Math.max(0, daysBetween(CONST_DATE_START));
       $('#daysMeet').textContent = meet;
       $('#daysStart').textContent = start;
       $('#tlTogether').textContent = `вместе ${start} ${wordDays(start)}`;
-
-      // FIX #2: gap считается из дат, а не захардкожен
       const gap = Math.max(0, start - meet);
       const gapEl = $('#tlGap1');
       if (gapEl) gapEl.textContent = gap + ' ' + wordDays(gap) + ' до первого «да»';
@@ -989,7 +842,6 @@
        ============================================================ */
     async function supabaseFetch(path) {
       if (!supabaseReady) throw new Error('no supabase');
-      // FIX #16: таймаут, чтобы не висеть в лоадере бесконечно
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), SUPABASE_TIMEOUT_MS);
       try {
@@ -1109,7 +961,7 @@
     function renderKiss() {
       $('#kissCount').textContent = 'Ты уже поцеловала меня ' + kissCount + ' раз ❤️';
     }
-    $('#kissHeart').addEventListener('click', (e) => {
+    $('#kissHeart').addEventListener('click', () => {
       haptic('heavy');
       kissCount++;
       localStorage.setItem('kissCount', kissCount);
@@ -1145,7 +997,6 @@
         saveScore('kiss', kissCount);
       }, 1500);
     }
-    // FIX #11: сохраняем при уходе со страницы, чтобы не терять последние клики
     window.addEventListener('pagehide', () => {
       if (kissSaveTimer) {
         clearTimeout(kissSaveTimer);
@@ -1156,7 +1007,6 @@
 
     $('#btnShareKiss').addEventListener('click', () => {
       haptic('medium');
-      // FIX #4: sendData молча не работает в inline-режиме — предупреждаем в консоль
       if (tg && typeof tg.sendData === 'function' && tg.initData) {
         try { tg.sendData(JSON.stringify({ type: 'kiss', count: kissCount })); }
         catch (e) { console.warn('sendData failed:', e); }
@@ -1176,16 +1026,14 @@
         const photos = await supabaseFetch('photos?select=*&order=created_at.desc');
         renderPhotos(photos || []);
         renderPhotoOfDay(photos || []);
-        photosLoaded = true;    // FIX #3: ставим флаг только после успеха
+        photosLoaded = true;
       } catch (e) {
-        // FIX #3: при ошибке показываем пусто, но НЕ блокируем повторную загрузку
         renderPhotos([]);
       } finally {
         $('#galleryLoader').classList.add('hidden');
       }
     }
 
-    // FIX #15: делегированный обработчик error в capture-фазе — работает и для innerHTML
     $('#photoGrid').addEventListener('error', (e) => {
       if (e.target && e.target.tagName === 'IMG') e.target.style.opacity = '0.2';
     }, true);
@@ -1216,7 +1064,6 @@
       $('#pvCap').textContent = cap || '';
       $('#photoViewer').classList.remove('hidden');
     }
-    // FIX #12: очищаем src при закрытии
     function closeViewer() {
       $('#photoViewer').classList.add('hidden');
       $('#pvImg').src = '';
@@ -1239,7 +1086,6 @@
       try { saved = JSON.parse(localStorage.getItem('photoDay') || 'null'); } catch (e) {}
       let photo;
       if (saved && saved.key === key) {
-        // FIX #13: страхуемся — ищем сначала по url, потом по id, потом берём первую
         photo = photos.find(p => p.url && p.url === saved.url)
              || photos.find(p => p.id && p.id === saved.id)
              || photos[0];
@@ -1248,7 +1094,6 @@
         const idx = parseInt(seed, 10) % photos.length;
         photo = photos[idx];
       }
-      // FIX #13: сохраняем и id, и url — на случай если id окажется null/undefined
       localStorage.setItem('photoDay', JSON.stringify({
         key: key,
         id: photo.id || null,
@@ -1345,7 +1190,6 @@
       const canvas = $('#dinoCanvas');
       const ctx = canvas.getContext('2d');
       const scoreEl = $('#gameScore');
-      // FIX #9: W теперь let, чтобы обновлять при ресайзе/повороте
       let W = canvas.parentElement.clientWidth;
       canvas.width = W;
       canvas.height = 280;
@@ -1372,13 +1216,9 @@
         if (e.code === 'Space') { e.preventDefault(); if (!e.repeat) jump(); }
       }
       function onVisibility() { lastTime = null; accumulator = 0; }
-      // FIX #9: ресайз канваса при повороте/смене размера
       function onResize() {
         const newW = canvas.parentElement.clientWidth;
-        if (newW > 0 && newW !== W) {
-          W = newW;
-          canvas.width = newW;
-        }
+        if (newW > 0 && newW !== W) { W = newW; canvas.width = newW; }
       }
       function cleanup() {
         over = true;
@@ -1471,16 +1311,22 @@
       window._dinoRaf = requestAnimationFrame(loop);
     }
 
-    /* --- Блок-бласт --- */
+    /* ============================================================
+       БЛОК-БЛАСТ — новая версия с drag & drop
+       ============================================================ */
     function startBlock() {
       const body = $('#gameBody');
-      body.innerHTML = '<div class="block-board" id="blockGrid" aria-label="Поле 8 на 8"></div>' +
-        '<p class="block-hint" id="blockHint">Выбери фигуру, затем её верхний левый угол на поле</p>' +
+      body.innerHTML =
+        '<div class="block-board" id="blockGrid" aria-label="Поле 8 на 8"></div>' +
+        '<p class="block-hint" id="blockHint">Перетащи фигуру на поле</p>' +
         '<div class="block-tray" id="blockTray"></div>' +
         '<div style="text-align:center;margin-top:14px"><button class="btn ghost" id="blockDone">Завершить игру</button></div>';
+
       const grid = $('#blockGrid');
       const tray = $('#blockTray');
       const hint = $('#blockHint');
+      const scoreEl = $('#gameScore');
+
       const shapes = [
         [[0,0],[0,1],[0,2],[0,3]],
         [[0,0],[1,0],[2,0],[3,0]],
@@ -1496,140 +1342,293 @@
         [[0,0],[1,0],[1,1],[2,1]],
         [[0,1],[1,0],[1,1],[2,0]]
       ];
-      let cells = Array(64).fill(false), pieces = [], selected = -1;
+
+      let cells = Array(64).fill(false);
+      let pieces = [];
       let score = 0, locked = false, finished = false, clearTimer = null;
+      let dragging = null;   // состояние текущего drag
       const tiles = [];
-      function canPlace(shape, anchor) {
-        const r = Math.floor(anchor / 8), c = anchor % 8;
-        return shape.every(([dr,dc]) => r + dr < 8 && c + dc < 8 && !cells[(r+dr)*8+c+dc]);
+
+      /* ---------- утилиты ---------- */
+      function shapeRows(shape) { return Math.max(...shape.map(p => p[0])) + 1; }
+      function shapeCols(shape) { return Math.max(...shape.map(p => p[1])) + 1; }
+
+      function canPlace(shape, row, col) {
+        return shape.every(([dr, dc]) => {
+          const r = row + dr, c = col + dc;
+          return r >= 0 && r < 8 && c >= 0 && c < 8 && !cells[r * 8 + c];
+        });
       }
-      function hasMove(shape) {
-        return cells.some((_,i) => canPlace(shape,i));
+      function hasAnyPlacement(shape) {
+        for (let r = 0; r < 8; r++) {
+          for (let c = 0; c < 8; c++) {
+            if (canPlace(shape, r, c)) return true;
+          }
+        }
+        return false;
       }
+
       function clearPreview() {
-        tiles.forEach(el => el.classList.remove('preview','invalid'));
+        tiles.forEach(el => el.classList.remove('preview', 'invalid'));
       }
-      function preview(anchor) {
+      function showPreview(shape, row, col, valid) {
         clearPreview();
-        if (selected < 0 || !pieces[selected] || locked) return;
-        const shape = pieces[selected], valid = canPlace(shape,anchor);
-        const r = Math.floor(anchor/8), c = anchor%8;
-        shape.forEach(([dr,dc]) => {
-          if (r+dr < 8 && c+dc < 8) tiles[(r+dr)*8+c+dc].classList.add(valid ? 'preview' : 'invalid');
+        if (!shape) return;
+        shape.forEach(([dr, dc]) => {
+          const r = row + dr, c = col + dc;
+          if (r >= 0 && r < 8 && c >= 0 && c < 8) {
+            tiles[r * 8 + c].classList.add(valid ? 'preview' : 'invalid');
+          }
         });
       }
       function paint() {
         clearPreview();
-        tiles.forEach((el,i) => {
+        tiles.forEach((el, i) => {
           el.className = 'block-cell' + (cells[i] ? ' filled' : '');
-          el.setAttribute('aria-label', 'Ряд ' + (Math.floor(i/8)+1) + ', столбец ' + (i%8+1) + (cells[i] ? ', занято' : ', свободно'));
+          el.setAttribute('aria-label',
+            'Ряд ' + (Math.floor(i / 8) + 1) + ', столбец ' + (i % 8 + 1) + (cells[i] ? ', занято' : ', свободно'));
         });
-        $('#gameScore').textContent = 'Счёт: ' + score;
+        scoreEl.textContent = 'Счёт: ' + score;
       }
+
+      /* ---------- метрики поля ---------- */
+      function getBoardMetrics() {
+        const c0 = tiles[0].getBoundingClientRect();
+        const c1 = tiles[1].getBoundingClientRect();
+        const c8 = tiles[8].getBoundingClientRect();
+        return {
+          originX: c0.left,
+          originY: c0.top,
+          cellW: c0.width,
+          cellH: c0.height,
+          pitchX: c1.left - c0.left,
+          pitchY: c8.top - c0.top
+        };
+      }
+
+      /* ---------- лоток ---------- */
       function renderTray() {
         tray.innerHTML = '';
-        pieces.forEach((shape,i) => {
+        pieces.forEach((shape, i) => {
           const btn = document.createElement('button');
-          btn.className = 'block-piece' + (i === selected ? ' selected' : '');
+          btn.className = 'block-piece';
           btn.disabled = !shape;
-          btn.setAttribute('aria-label', shape ? 'Фигура ' + (i+1) : 'Фигура использована');
-          btn.setAttribute('aria-pressed', String(i === selected));
+          btn.setAttribute('aria-label', shape ? 'Фигура ' + (i + 1) + '. Перетащи на поле' : 'Фигура использована');
           if (shape) {
-            const rows = Math.max(...shape.map(p=>p[0]))+1;
-            const cols = Math.max(...shape.map(p=>p[1]))+1;
+            const rows = shapeRows(shape);
+            const cols = shapeCols(shape);
             const mini = document.createElement('span');
             mini.className = 'block-mini';
-            mini.style.gridTemplateColumns = 'repeat(' + cols + ', 16px)';
-            for (let r=0;r<rows;r++) for(let c=0;c<cols;c++) {
-              const pixel = document.createElement('span');
-              pixel.className = 'block-pixel' + (shape.some(p=>p[0]===r && p[1]===c) ? ' filled' : '');
-              mini.appendChild(pixel);
+            mini.style.gridTemplateColumns = `repeat(${cols}, 16px)`;
+            for (let r = 0; r < rows; r++) {
+              for (let c = 0; c < cols; c++) {
+                const pixel = document.createElement('span');
+                pixel.className = 'block-pixel' + (shape.some(p => p[0] === r && p[1] === c) ? ' filled' : '');
+                mini.appendChild(pixel);
+              }
             }
             btn.appendChild(mini);
-            btn.addEventListener('click', () => {
-              if (locked || finished) return;
-              selected = i;
-              clearPreview();
-              renderTray();
-              hint.textContent = 'Нажми на поле: здесь будет верхний левый угол фигуры';
-              haptic('light');
-            });
-          } else btn.textContent = '✓';
+            btn.addEventListener('pointerdown', (e) => startDrag(e, i, btn));
+            btn.addEventListener('contextmenu', e => e.preventDefault());
+          } else {
+            btn.textContent = '✓';
+          }
           tray.appendChild(btn);
         });
       }
-      function finish() {
-        if (finished) return;
-        finished = true;
-        cleanup();
-        body.innerHTML = '<div class="game-end" id="blockEnd"></div>';
-        gameEnd('🧱 Блок-бласт',score,'block',$('#blockEnd'));
-      }
-      function cleanup() {
-        finished = true;
-        clearTimeout(clearTimer);
-        window._blockCleanup = null;
-      }
-      window._blockCleanup = cleanup;
-      function nextTurn() {
-        if (finished) return;
-        locked = false;
-        if (pieces.every(p=>!p)) pieces = Array.from({length:3},()=>shapes[Math.floor(Math.random()*shapes.length)]);
-        selected = pieces.findIndex(p=>p && hasMove(p));
-        paint();
-        renderTray();
-        if (selected < 0) { finish(); return; }
-        hint.textContent = 'Выбери фигуру и поставь её на поле. Заполняй строки и столбцы!';
-      }
-      function place(anchor) {
-        if (locked || finished || selected < 0) return;
-        const shape = pieces[selected];
-        if (!shape || !canPlace(shape,anchor)) {
-          preview(anchor);
-          hint.textContent = 'Здесь фигура не помещается. Выбери другое место или фигуру';
-          return;
+
+      /* ---------- drag & drop ---------- */
+      function startDrag(e, index, btn) {
+        if (locked || finished || dragging) return;
+        const shape = pieces[index];
+        if (!shape) return;
+        // только primary pointer (левая кнопка / первый палец)
+        if (e.button !== undefined && e.button !== 0) return;
+
+        e.preventDefault();
+        const m = getBoardMetrics();
+        const rows = shapeRows(shape);
+        const cols = shapeCols(shape);
+
+        const ghostW = cols * m.pitchX - (m.pitchX - m.cellW);
+        const ghostH = rows * m.pitchY - (m.pitchY - m.cellH);
+        const origRect = btn.getBoundingClientRect();
+        const relX = Math.min(1, Math.max(0, (e.clientX - origRect.left) / origRect.width));
+        const relY = Math.min(1, Math.max(0, (e.clientY - origRect.top) / origRect.height));
+        const grabOffsetX = relX * ghostW;
+        const grabOffsetY = relY * ghostH;
+
+        const ghost = document.createElement('div');
+        ghost.className = 'block-ghost';
+        ghost.style.width = ghostW + 'px';
+        ghost.style.height = ghostH + 'px';
+        ghost.style.gridTemplateColumns = `repeat(${cols}, ${m.cellW}px)`;
+        ghost.style.gridTemplateRows = `repeat(${rows}, ${m.cellH}px)`;
+        const gapSize = Math.max(0, m.pitchX - m.cellW);
+        ghost.style.gap = gapSize + 'px';
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'block-ghost-cell' + (shape.some(p => p[0] === r && p[1] === c) ? ' filled' : '');
+            ghost.appendChild(cell);
+          }
         }
-        const r = Math.floor(anchor/8), c = anchor%8;
-        shape.forEach(([dr,dc])=>cells[(r+dr)*8+c+dc]=true);
-        score += shape.length;
-        pieces[selected] = null;
-        selected = -1;
+        document.body.appendChild(ghost);
+        btn.classList.add('dragging');
+        document.body.classList.add('block-dragging');
+
+        dragging = {
+          index, shape, ghost, grabOffsetX, grabOffsetY, m, btn,
+          row: -1, col: -1, valid: false
+        };
+
         haptic('light');
+        updateGhost(e.clientX, e.clientY);
+
+        document.addEventListener('pointermove', onDragMove, { passive: false });
+        document.addEventListener('pointerup', onDragEnd);
+        document.addEventListener('pointercancel', onDragEnd);
+      }
+
+      function updateGhost(clientX, clientY) {
+        if (!dragging) return;
+        const { shape, ghost, grabOffsetX, grabOffsetY, m } = dragging;
+        const ghostLeft = clientX - grabOffsetX;
+        const ghostTop = clientY - grabOffsetY;
+        const col = Math.round((ghostLeft - m.originX) / m.pitchX);
+        const row = Math.round((ghostTop - m.originY) / m.pitchY);
+
+        ghost.style.left = (m.originX + col * m.pitchX) + 'px';
+        ghost.style.top = (m.originY + row * m.pitchY) + 'px';
+
+        const valid = canPlace(shape, row, col);
+        dragging.row = row;
+        dragging.col = col;
+        dragging.valid = valid;
+        showPreview(shape, row, col, valid);
+      }
+
+      function onDragMove(e) {
+        if (!dragging) return;
+        e.preventDefault();
+        updateGhost(e.clientX, e.clientY);
+      }
+
+      function onDragEnd(e) {
+        if (!dragging) return;
+        e.preventDefault && e.preventDefault();
+        const { index, shape, ghost, valid, row, col, btn } = dragging;
+        ghost.remove();
+        btn.classList.remove('dragging');
+        document.body.classList.remove('block-dragging');
+        clearPreview();
+        document.removeEventListener('pointermove', onDragMove);
+        document.removeEventListener('pointerup', onDragEnd);
+        document.removeEventListener('pointercancel', onDragEnd);
+        dragging = null;
+
+        if (valid && pieces[index] === shape) {
+          place(index, row, col);
+        }
+      }
+
+      /* ---------- постановка фигуры ---------- */
+      function place(index, row, col) {
+        const shape = pieces[index];
+        if (!shape) return;
+        shape.forEach(([dr, dc]) => { cells[(row + dr) * 8 + (col + dc)] = true; });
+        score += shape.length;
+        pieces[index] = null;
+        haptic('light');
+
+        // проверка заполненных рядов/колонок
         const burn = new Set();
         let lines = 0;
-        for(let n=0;n<8;n++) {
-          const row = Array.from({length:8},(_,i)=>n*8+i);
-          const col = Array.from({length:8},(_,i)=>i*8+n);
-          for(const line of [row,col]) if(line.every(i=>cells[i])) {
-            lines++;
-            line.forEach(i=>burn.add(i));
+        for (let n = 0; n < 8; n++) {
+          const rowIdx = Array.from({ length: 8 }, (_, i) => n * 8 + i);
+          const colIdx = Array.from({ length: 8 }, (_, i) => i * 8 + n);
+          for (const line of [rowIdx, colIdx]) {
+            if (line.every(i => cells[i])) {
+              lines++;
+              line.forEach(i => burn.add(i));
+            }
           }
         }
         score += lines * 80;
         paint();
         renderTray();
+
         if (burn.size) {
           locked = true;
           haptic('medium');
-          burn.forEach(i=>tiles[i].classList.add('burn'));
-          clearTimer = setTimeout(()=> {
-            burn.forEach(i=>cells[i]=false);
-            nextTurn();
-          },350);
-        } else nextTurn();
+          burn.forEach(i => tiles[i].classList.add('burn'));
+          clearTimer = setTimeout(() => {
+            burn.forEach(i => { cells[i] = false; });
+            locked = false;
+            afterPlace();
+          }, 350);
+        } else {
+          afterPlace();
+        }
       }
-      for(let i=0;i<64;i++) {
+
+      function afterPlace() {
+        if (finished) return;
+        const alivePieces = pieces.filter(p => p);
+
+        if (alivePieces.length === 0) {
+          // все три использованы — новая тройка
+          pieces = Array.from({ length: 3 }, () => shapes[Math.floor(Math.random() * shapes.length)]);
+          renderTray();
+          hint.textContent = 'Новая порция фигур! 🎉';
+          return;
+        }
+
+        const anyMove = alivePieces.some(shape => hasAnyPlacement(shape));
+        if (!anyMove) {
+          finish();
+          return;
+        }
+        hint.textContent = 'Перетащи фигуру на поле';
+      }
+
+      /* ---------- конец игры ---------- */
+      function cleanup() {
+        finished = true;
+        clearTimeout(clearTimer);
+        if (dragging) {
+          dragging.ghost && dragging.ghost.remove();
+          dragging.btn && dragging.btn.classList.remove('dragging');
+          document.body.classList.remove('block-dragging');
+          document.removeEventListener('pointermove', onDragMove);
+          document.removeEventListener('pointerup', onDragEnd);
+          document.removeEventListener('pointercancel', onDragEnd);
+          dragging = null;
+        }
+        window._blockCleanup = null;
+      }
+      window._blockCleanup = cleanup;
+
+      function finish() {
+        if (finished) return;
+        cleanup();
+        body.innerHTML = '<div class="game-end" id="blockEnd"></div>';
+        gameEnd('🧱 Блок-бласт', score, 'block', $('#blockEnd'));
+      }
+
+      /* ---------- инициализация поля ---------- */
+      for (let i = 0; i < 64; i++) {
         const el = document.createElement('button');
         el.className = 'block-cell';
-        el.addEventListener('click',()=>place(i));
-        el.addEventListener('pointerenter',()=>preview(i));
-        el.addEventListener('focus',()=>preview(i));
+        el.type = 'button';
         tiles.push(el);
         grid.appendChild(el);
       }
-      grid.addEventListener('pointerleave',clearPreview);
-      $('#blockDone').addEventListener('click',finish);
-      nextTurn();
+      $('#blockDone').addEventListener('click', finish);
+
+      pieces = Array.from({ length: 3 }, () => shapes[Math.floor(Math.random() * shapes.length)]);
+      renderTray();
+      paint();
     }
 
     /* --- Найди пару --- */
@@ -1665,7 +1664,6 @@
               haptic('medium');
               opened = []; lock = false;
               if (matched === 6) {
-                // FIX #14: нормируем так, чтобы идеальные 6 ходов = 100
                 const score = Math.max(1, Math.round(100 * 6 / Math.max(6, moves)));
                 body.innerHTML = '<div class="game-end" id="memEnd"></div>';
                 gameEnd('🃏 Найди пару', score, 'memory', $('#memEnd'));
