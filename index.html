@@ -36,9 +36,6 @@
       position: relative;
     }
 
-    /* ============================================================
-       Изоляция эффектов
-       ============================================================ */
     #fx-layer {
       position: fixed;
       inset: 0;
@@ -75,9 +72,6 @@
       100% { transform: translateY(-115vh) rotate(-15deg) scale(0.9); opacity: 0; }
     }
 
-    /* ============================================================
-       Пул частиц
-       ============================================================ */
     .particle {
       position: absolute;
       pointer-events: none;
@@ -466,7 +460,7 @@
     }
 
     /* ============================================================
-       Убегающая «Нет» v2
+       Убегающая «Нет» v2.1 — анти-баг с pointerenter, cooldown
        ============================================================ */
     .modal, .quest-card { position: relative; }
 
@@ -525,7 +519,8 @@
       will-change: transform;
     }
     .btn-no.evaporating {
-      transition: transform 0.38s ease-in, opacity 0.38s ease-in;
+      transform-origin: center;
+      transition: transform 0.4s ease-in, opacity 0.4s ease-in;
       pointer-events: none;
     }
 
@@ -1025,7 +1020,10 @@
     }
 
     /* ============================================================
-       Убегающая «Нет» v2
+       Убегающая «Нет» v2.1
+       — убран pointerenter (главный источник бага с мышью)
+       — добавлен cooldown между побегами
+       — быстрый двойной клик ловит кнопку
        ============================================================ */
     const TEASE_POOL = [
       'неет, не нажимай',
@@ -1050,9 +1048,12 @@
       const escapeTexts  = opts.escapeTexts  || ['Нет', 'Точно?', 'Уверена?', 'Ну пожалуйста…', '🥺', '...'];
       const maxEscapes   = opts.maxEscapes   ?? 5;
       const minScale     = opts.minScale     ?? 0.55;
-      const minDistance  = opts.minDistance  ?? 90;
+      const minDistance  = opts.minDistance  ?? 120;
       const padding      = opts.padding      ?? 8;
       const onCaught     = opts.onCaught     || null;
+
+      // Анти-баг: два побега не чаще раза в 380мс
+      const ESCAPE_COOLDOWN = 380;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       const tiles = container.querySelector('.choice-tiles') || container;
@@ -1068,6 +1069,7 @@
       let origLeft = 0, origTop = 0, origW = 0, origH = 0;
       let rafId = null;
       let lastPX = 0, lastPY = 0;
+      let lastEscapeTime = -9999;
       let activeTeasers = 0;
 
       function initAbsolute() {
@@ -1094,14 +1096,14 @@
       }
 
       function currentScale() {
-        return Math.max(minScale, 1 - escapes * 0.09);
+        return Math.max(minScale, 1 - escapes * 0.08);
       }
       function currentText() {
         return escapeTexts[Math.min(escapes, escapeTexts.length - 1)];
       }
 
       function spawnTeaser() {
-        if (activeTeasers >= 4 || reduceMotion) return;
+        if (activeTeasers >= 3 || reduceMotion) return;
         const txt = TEASE_POOL[(Math.random() * TEASE_POOL.length) | 0];
         const el = document.createElement('div');
         el.className = 'teaser';
@@ -1129,20 +1131,28 @@
         const maxX = Math.max(padding, tRect.width  - w - padding);
         const maxY = Math.max(padding, tRect.height - h - padding);
 
-        let nx = padding, ny = padding, tries = 0;
-        do {
+        let nx = padding, ny = padding;
+        let bestNx = nx, bestNy = ny, bestDist = -1;
+        let tries = 0;
+
+        while (tries < 20) {
           nx = padding + Math.random() * (maxX - padding);
           ny = padding + Math.random() * (maxY - padding);
           tries++;
-        } while (tries < 10 && Math.hypot(
-          tRect.left + nx + w / 2 - px,
-          tRect.top  + ny + h / 2 - py
-        ) < minDistance);
+          const d = Math.hypot(
+            tRect.left + nx + w / 2 - px,
+            tRect.top  + ny + h / 2 - py
+          );
+          if (d > bestDist) { bestDist = d; bestNx = nx; bestNy = ny; }
+          if (d >= minDistance) break;
+        }
+        if (bestDist < minDistance) { nx = bestNx; ny = bestNy; }
 
         const tx = nx - origLeft;
         const ty = ny - origTop;
         noBtn.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
         escapes++;
+        lastEscapeTime = performance.now();
         noBtn.textContent = currentText();
         haptic('light');
         spawnTeaser();
@@ -1154,9 +1164,15 @@
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         removeListeners();
 
+        initAbsolute();
+
+        // Сохраняем текущий translate, добавляем scale + rotate для испарения
+        const prev = noBtn.style.transform || '';
+        // Убираем scale(...) из prev, чтобы не было двойного scale
+        const cleaned = prev.replace(/scale\([^)]*\)/, '').trim();
         noBtn.classList.add('evaporating');
         noBtn.style.opacity = '0';
-        noBtn.style.transform += ' scale(0.15) rotate(-12deg)';
+        noBtn.style.transform = (cleaned ? cleaned + ' ' : '') + 'scale(0.15) rotate(-14deg)';
 
         setTimeout(() => {
           noBtn.style.display = 'none';
@@ -1166,40 +1182,43 @@
           if (yesBtn) yesBtn.classList.add('pulse');
           teaserLayer.querySelectorAll('.teaser').forEach(el => el.remove());
           activeTeasers = 0;
-        }, 400);
+        }, 420);
 
         haptic('medium');
         toast('Поймала! 😏', 1400);
         if (onCaught) onCaught();
       }
 
-      function onPointerEnter(e) {
-        if (caught || escapes >= maxEscapes) return;
-        escapeFrom(e.clientX, e.clientY);
-      }
       function onPointerDown(e) {
         if (caught) return;
         if (e.button !== undefined && e.button !== 0) return;
 
-        if (escapes >= maxEscapes) return;
         e.preventDefault();
         e.stopPropagation();
+
+        const now = performance.now();
+        const recentlyEscaped = (now - lastEscapeTime) < ESCAPE_COOLDOWN;
+
+        // Быстрый повторный клик или все попытки исчерпаны — ловим
+        if (escapes >= maxEscapes || recentlyEscaped) {
+          catchIt();
+          return;
+        }
         escapeFrom(e.clientX, e.clientY);
       }
-      function onClick(e) {
-        if (caught) return;
-        e.preventDefault();
-        e.stopPropagation();
-        catchIt();
-      }
+
       function onPointerMove(e) {
         if (caught || escapes >= maxEscapes) return;
+        // Анти-баг: во время cooldown pointermove игнорируется полностью
+        if (performance.now() - lastEscapeTime < ESCAPE_COOLDOWN) return;
+
         lastPX = e.clientX;
         lastPY = e.clientY;
         if (rafId) return;
         rafId = requestAnimationFrame(() => {
           rafId = null;
           if (caught || escapes >= maxEscapes) return;
+          if (performance.now() - lastEscapeTime < ESCAPE_COOLDOWN) return;
           const bRect = noBtn.getBoundingClientRect();
           const cx = bRect.left + bRect.width / 2;
           const cy = bRect.top  + bRect.height / 2;
@@ -1210,21 +1229,14 @@
       }
 
       function removeListeners() {
-        noBtn.removeEventListener('pointerenter', onPointerEnter);
         noBtn.removeEventListener('pointerdown', onPointerDown);
-        noBtn.removeEventListener('click', onClick);
         container.removeEventListener('pointermove', onPointerMove);
       }
 
       if (reduceMotion) {
-        noBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          catchIt();
-        });
+        noBtn.addEventListener('click', (e) => { e.preventDefault(); catchIt(); });
       } else {
-        noBtn.addEventListener('pointerenter', onPointerEnter);
         noBtn.addEventListener('pointerdown', onPointerDown, { passive: false });
-        noBtn.addEventListener('click', onClick);
         container.addEventListener('pointermove', onPointerMove, { passive: true });
       }
 
@@ -1720,21 +1732,11 @@
     document.querySelectorAll('.game-card').forEach(card => {
       card.addEventListener('click', () => { haptic('light'); openGame(card.dataset.game); });
     });
+
+    // БАГФИКС: из мини-игр убегающая кнопка убрана — прямой выход
     $('#gameBack').addEventListener('click', () => {
-      showChoiceModal({
-        emo: '🎮',
-        txt: 'Выйти из игры?',
-        yesText: 'Играть дальше',
-        noText: 'Выйти',
-        escapeTexts: ['Выйти', 'Точно?', 'Ещё чуть-чуть…', '🥺', '...'],
-        maxEscapes: 4,
-        dismissible: true,
-        onYes: () => {},
-        onClose: () => {
-          closeGame();
-          switchTab('games');
-        }
-      });
+      closeGame();
+      switchTab('games');
     });
 
     function openGame(name) {
@@ -1908,7 +1910,7 @@
       window._dinoRaf = requestAnimationFrame(loop);
     }
 
-    /* --- Блок-бласт (drag & drop) --- */
+    /* --- Блок-бласт --- */
     function startBlock() {
       const body = $('#gameBody');
       body.innerHTML =
