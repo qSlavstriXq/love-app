@@ -460,7 +460,7 @@
     }
 
     /* ============================================================
-       Убегающая «Нет» v3 — по всему экрану, position: fixed
+       Убегающая «Нет» v4 — тело-уровень, вся площадь экрана
        ============================================================ */
     .choice-tiles {
       display: grid;
@@ -508,15 +508,15 @@
       transform-origin: center center;
     }
 
-    /* Ключевой класс — кнопка переезжает в fixed относительно viewport */
+    /* Когда кнопка улетела в body — это fixed относительно viewport */
     .btn-no.runaway-fixed {
       position: fixed;
-      z-index: 200;
+      z-index: 9999;
       margin: 0;
       transform-origin: center center;
-      transition: left 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  top  0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  transform 0.28s ease,
+      transition: left 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  top  0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  transform 0.3s ease,
                   opacity 0.32s ease;
       will-change: left, top, transform, opacity;
     }
@@ -530,14 +530,14 @@
       inset: 0;
       pointer-events: none;
       overflow: hidden;
-      z-index: 90;
+      z-index: 9998;
     }
     .teaser {
       position: absolute;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: bold;
       color: #ffb3d9;
-      background: rgba(40, 20, 70, 0.9);
+      background: rgba(40, 20, 70, 0.92);
       padding: 6px 11px;
       border-radius: 12px;
       white-space: nowrap;
@@ -785,9 +785,6 @@
       try { tg.setBackgroundColor('#0f0c2a'); } catch (e) {}
     }
 
-    /* ============================================================
-       Константы
-       ============================================================ */
     const CONST_SUPABASE_URL = 'ВСТАВЬ_URL';
     const CONST_SUPABASE_KEY = 'ВСТАВЬ_KEY';
     const CONST_DATE_MEET  = '2026-05-13';
@@ -799,7 +796,7 @@
     const KISS_EFFECT_COOLDOWN = 60;
 
     /* ============================================================
-       Утилиты + кеш DOM
+       Утилиты
        ============================================================ */
     const $ = (s) => document.querySelector(s);
     const fxLayer = $('#fx-layer');
@@ -960,7 +957,7 @@
     });
 
     /* ============================================================
-       Счётчики дней
+       Счётчики
        ============================================================ */
     function daysBetween(dateStr) {
       const d = new Date(dateStr + 'T00:00:00');
@@ -1021,11 +1018,7 @@
     }
 
     /* ============================================================
-       Убегающая «Нет» v3
-       — position: fixed → летает по всему экрану
-       — только pointerdown (никаких enter / move)
-       — двойной клик < 150мс = поймал
-       — после maxEscapes клик = поймал
+       Убегающая «Нет» v4 — вылетает в body, вся площадь экрана
        ============================================================ */
     const TEASE_POOL = [
       'неет, не нажимай',
@@ -1043,14 +1036,16 @@
       'ты же не серьезно',
       'не-не-не',
       'стоп-стоп',
-      'я тут, рядом'
+      'я тут, рядом',
+      'попробуй поймать 😏',
+      'я быстрая',
+      'догоняй!'
     ];
 
     function makeRunaway(noBtn, container, opts = {}) {
       const escapeTexts = opts.escapeTexts || ['Нет', 'Точно?', 'Уверена?', 'Ну пожалуйста…', '🥺', '...'];
-      const maxEscapes  = opts.maxEscapes  ?? 4;
+      const maxEscapes  = opts.maxEscapes  ?? 5;
       const minScale    = opts.minScale    ?? 0.55;
-      const padding     = opts.padding     ?? 20;
       const onCaught    = opts.onCaught    || null;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -1062,38 +1057,33 @@
 
       let escapes = 0;
       let caught = false;
-      let initialized = false;
+      let inBody = false;
       let origW = 0, origH = 0;
       let lastDownTime = 0;
       let activeTeasers = 0;
 
-      function initFixed() {
-        if (initialized) return;
-        initialized = true;
-
-        // сбрасываем контекст трансформации у модалки — иначе fixed будет относительно неё
-        const host = noBtn.closest('.modal, .quest-card');
-        if (host) {
-          host.style.animation = 'none';
-          host.style.transform = 'none';
-        }
+      // Ключевой момент: при первом побеге кнопка "выпрыгивает" из модалки в body
+      function detachToBody() {
+        if (inBody) return;
+        inBody = true;
 
         const r = noBtn.getBoundingClientRect();
         origW = r.width;
         origH = r.height;
 
-        // плейсхолдер — чтобы «Да» не прыгала
+        // Плейсхолдер — чтобы "Да" не прыгнула
         const ph = document.createElement('div');
         ph.className = 'btn-no-placeholder';
         ph.style.width = origW + 'px';
         ph.style.height = origH + 'px';
-        if (noBtn.parentNode) noBtn.parentNode.appendChild(ph);
+        if (noBtn.parentNode) noBtn.parentNode.insertBefore(ph, noBtn);
 
+        document.body.appendChild(noBtn);
         noBtn.classList.add('runaway-fixed');
-        noBtn.style.width = origW + 'px';
+        noBtn.style.width  = origW + 'px';
         noBtn.style.height = origH + 'px';
-        noBtn.style.left = r.left + 'px';
-        noBtn.style.top = r.top + 'px';
+        noBtn.style.left   = r.left + 'px';
+        noBtn.style.top    = r.top  + 'px';
       }
 
       function currentScale() {
@@ -1118,33 +1108,48 @@
         setTimeout(() => { el.remove(); activeTeasers--; }, 2200);
       }
 
+      // Убегание на всю площадь viewport
       function escapeFrom() {
         if (caught) return;
-        initFixed();
+        detachToBody();
 
         const scale = currentScale();
         const visW = origW * scale;
         const visH = origH * scale;
         const vw = window.innerWidth;
         const vh = window.innerHeight;
+        const pad = 16;
 
-        // Центр видимой кнопки. Ограничиваем так, чтобы видимая кнопка не вылезала за края.
-        const minCx = padding + visW / 2;
-        const maxCx = vw - padding - visW / 2;
-        const minCy = padding + visH / 2;
-        const maxCy = vh - padding - visH / 2;
+        // Возможные края для видимой кнопки
+        const minLeft = pad;
+        const maxLeft = vw - visW - pad;
+        const minTop  = pad;
+        const maxTop  = vh - visH - pad;
+        if (maxLeft < minLeft || maxTop < minTop) return;
 
-        let cx = minCx, cy = minCy;
-        if (maxCx > minCx && maxCy > minCy) {
-          cx = minCx + Math.random() * (maxCx - minCx);
-          cy = minCy + Math.random() * (maxCy - minCy);
+        // Текущая позиция центра
+        const curLeft = parseFloat(noBtn.style.left) || 0;
+        const curTop  = parseFloat(noBtn.style.top)  || 0;
+        const curCx = curLeft + origW / 2;
+        const curCy = curTop  + origH / 2;
+
+        // Нужно улететь далеко: минимум 35% диагонали
+        const minJump = Math.hypot(vw, vh) * 0.35;
+
+        // Ищем новую точку
+        let bestL = minLeft, bestT = minTop, bestD = -1;
+        for (let i = 0; i < 24; i++) {
+          const tryL = minLeft + Math.random() * (maxLeft - minLeft);
+          const tryT = minTop  + Math.random() * (maxTop  - minTop);
+          const tryCx = tryL + visW / 2;
+          const tryCy = tryT + visH / 2;
+          const dist = Math.hypot(tryCx - curCx, tryCy - curCy);
+          if (dist > bestD) { bestD = dist; bestL = tryL; bestT = tryT; }
+          if (dist >= minJump) { bestL = tryL; bestT = tryT; break; }
         }
 
-        const left = cx - origW / 2;
-        const top  = cy - origH / 2;
-
-        noBtn.style.left = left + 'px';
-        noBtn.style.top  = top  + 'px';
+        noBtn.style.left = bestL + 'px';
+        noBtn.style.top  = bestT + 'px';
         noBtn.style.transform = `scale(${scale})`;
 
         escapes++;
@@ -1157,12 +1162,11 @@
         if (caught) return;
         caught = true;
         removeListeners();
-        initFixed();
+        detachToBody();
 
         noBtn.classList.add('evaporating');
         noBtn.style.opacity = '0';
-        const currentScaleStr = `scale(${currentScale()})`;
-        noBtn.style.transform = `${currentScaleStr} scale(0.15) rotate(-16deg)`;
+        noBtn.style.transform = `scale(${currentScale()}) scale(0.15) rotate(-16deg)`;
 
         setTimeout(() => {
           noBtn.style.display = 'none';
@@ -1190,11 +1194,8 @@
         const dt = now - lastDownTime;
         lastDownTime = now;
 
-        // Двойной быстрый клик — ловит
         if (dt < 150) { catchIt(); return; }
-        // Исчерпаны попытки — тоже ловит
         if (escapes >= maxEscapes) { catchIt(); return; }
-        // Иначе — убегает
         escapeFrom();
       }
 
@@ -1212,6 +1213,10 @@
         caught = true;
         removeListeners();
         teaserLayer.remove();
+        // если кнопка улетела в body — убираем её оттуда
+        if (inBody && noBtn.parentNode === document.body) {
+          noBtn.remove();
+        }
       };
     }
 
@@ -1240,7 +1245,7 @@
 
       const cleanupRunaway = makeRunaway(noBtn, modal, {
         escapeTexts: opts.escapeTexts || ['Нет', 'Точно?', 'Уверена?', 'Ну пожалуйста…', '🥺', '...'],
-        maxEscapes:  opts.maxEscapes  ?? 4,
+        maxEscapes:  opts.maxEscapes  ?? 5,
         onCaught:    opts.onCaught    || null
       });
 
@@ -1290,7 +1295,7 @@
 
       const cleanupRunaway = makeRunaway(noBtn, card, {
         escapeTexts: ['Нет', 'Точно нет?', 'Уверена?', 'Ну пожалуйста…', '🥺', '...'],
-        maxEscapes: 4
+        maxEscapes: 5
       });
 
       yesBtn.addEventListener('click', () => {
@@ -1309,9 +1314,6 @@
       });
     }
 
-    /* ============================================================
-       Кнопки главной
-       ============================================================ */
     $('#btnQuest').addEventListener('click', () => openQuest());
     $('#btnSweet').addEventListener('click', () => {
       showChoiceModal({
@@ -1320,7 +1322,7 @@
         yesText: 'Давай!',
         noText: 'Не сейчас',
         escapeTexts: ['Не сейчас', 'Точно?', 'Но почему…', '🥺', '...'],
-        maxEscapes: 4,
+        maxEscapes: 5,
         dismissible: true,
         onYes: () => switchTab('kiss')
       });
@@ -1363,9 +1365,6 @@
       } catch (e) {}
     }
 
-    /* ============================================================
-       Послание
-       ============================================================ */
     async function loadMessage() {
       const el = $('#msgText');
       try {
@@ -1436,7 +1435,6 @@
       }
     }
 
-    // БАГФИКС: выход из квеста — прямой, без убегающей кнопки
     $('#questBack').addEventListener('click', () => {
       $('#questLayer').classList.add('hidden');
       switchTab('home');
@@ -1690,7 +1688,6 @@
       card.addEventListener('click', () => { haptic('light'); openGame(card.dataset.game); });
     });
 
-    // БАГФИКС: прямой выход из игры без модалки
     $('#gameBack').addEventListener('click', () => {
       closeGame();
       switchTab('games');
