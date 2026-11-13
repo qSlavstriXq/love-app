@@ -460,10 +460,8 @@
     }
 
     /* ============================================================
-       Убегающая «Нет» v2.1 — анти-баг с pointerenter, cooldown
+       Убегающая «Нет» v3 — по всему экрану, position: fixed
        ============================================================ */
-    .modal, .quest-card { position: relative; }
-
     .choice-tiles {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -507,42 +505,45 @@
       -webkit-user-select: none;
       -webkit-touch-callout: none;
       box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-      transform-origin: top left;
-      transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
-                  opacity 0.28s ease;
+      transform-origin: center center;
     }
-    .btn-no.runaway {
-      position: absolute;
-      left: 0;
-      top: 0;
-      z-index: 10;
-      will-change: transform;
+
+    /* Ключевой класс — кнопка переезжает в fixed относительно viewport */
+    .btn-no.runaway-fixed {
+      position: fixed;
+      z-index: 200;
+      margin: 0;
+      transform-origin: center center;
+      transition: left 0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  top  0.32s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  transform 0.28s ease,
+                  opacity 0.32s ease;
+      will-change: left, top, transform, opacity;
     }
     .btn-no.evaporating {
-      transform-origin: center;
-      transition: transform 0.4s ease-in, opacity 0.4s ease-in;
       pointer-events: none;
+      transition: transform 0.42s ease-in, opacity 0.42s ease-in;
     }
 
     .teaser-layer {
-      position: absolute;
+      position: fixed;
       inset: 0;
       pointer-events: none;
       overflow: hidden;
-      z-index: 2;
+      z-index: 90;
     }
     .teaser {
       position: absolute;
       font-size: 12px;
       font-weight: bold;
       color: #ffb3d9;
-      background: rgba(40, 20, 70, 0.85);
-      padding: 5px 10px;
+      background: rgba(40, 20, 70, 0.9);
+      padding: 6px 11px;
       border-radius: 12px;
       white-space: nowrap;
       text-shadow: 0 1px 3px rgba(0,0,0,0.55);
-      border: 1px solid rgba(255, 107, 179, 0.35);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      border: 1px solid rgba(255, 107, 179, 0.4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       animation: teaseFloat 2.1s ease-out forwards;
       pointer-events: none;
       will-change: transform, opacity;
@@ -556,7 +557,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .choice-tiles.yes-solo > .btn { animation: none; }
-      .btn-no.runaway { transition: opacity 0.25s ease; }
+      .btn-no.runaway-fixed { transition: opacity 0.25s ease; }
       .teaser { animation-duration: 1.2s; }
     }
 
@@ -1020,10 +1021,11 @@
     }
 
     /* ============================================================
-       Убегающая «Нет» v2.1
-       — убран pointerenter (главный источник бага с мышью)
-       — добавлен cooldown между побегами
-       — быстрый двойной клик ловит кнопку
+       Убегающая «Нет» v3
+       — position: fixed → летает по всему экрану
+       — только pointerdown (никаких enter / move)
+       — двойной клик < 150мс = поймал
+       — после maxEscapes клик = поймал
        ============================================================ */
     const TEASE_POOL = [
       'неет, не нажимай',
@@ -1045,58 +1047,57 @@
     ];
 
     function makeRunaway(noBtn, container, opts = {}) {
-      const escapeTexts  = opts.escapeTexts  || ['Нет', 'Точно?', 'Уверена?', 'Ну пожалуйста…', '🥺', '...'];
-      const maxEscapes   = opts.maxEscapes   ?? 5;
-      const minScale     = opts.minScale     ?? 0.55;
-      const minDistance  = opts.minDistance  ?? 120;
-      const padding      = opts.padding      ?? 8;
-      const onCaught     = opts.onCaught     || null;
-
-      // Анти-баг: два побега не чаще раза в 380мс
-      const ESCAPE_COOLDOWN = 380;
+      const escapeTexts = opts.escapeTexts || ['Нет', 'Точно?', 'Уверена?', 'Ну пожалуйста…', '🥺', '...'];
+      const maxEscapes  = opts.maxEscapes  ?? 4;
+      const minScale    = opts.minScale    ?? 0.55;
+      const padding     = opts.padding     ?? 20;
+      const onCaught    = opts.onCaught    || null;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      const tiles = container.querySelector('.choice-tiles') || container;
       const yesBtn = container.querySelector('[data-yes]');
 
       const teaserLayer = document.createElement('div');
       teaserLayer.className = 'teaser-layer';
-      container.appendChild(teaserLayer);
+      document.body.appendChild(teaserLayer);
 
       let escapes = 0;
       let caught = false;
       let initialized = false;
-      let origLeft = 0, origTop = 0, origW = 0, origH = 0;
-      let rafId = null;
-      let lastPX = 0, lastPY = 0;
-      let lastEscapeTime = -9999;
+      let origW = 0, origH = 0;
+      let lastDownTime = 0;
       let activeTeasers = 0;
 
-      function initAbsolute() {
+      function initFixed() {
         if (initialized) return;
         initialized = true;
-        const bRect = noBtn.getBoundingClientRect();
-        const tRect = tiles.getBoundingClientRect();
-        origLeft = bRect.left - tRect.left;
-        origTop  = bRect.top  - tRect.top;
-        origW    = bRect.width;
-        origH    = bRect.height;
 
+        // сбрасываем контекст трансформации у модалки — иначе fixed будет относительно неё
+        const host = noBtn.closest('.modal, .quest-card');
+        if (host) {
+          host.style.animation = 'none';
+          host.style.transform = 'none';
+        }
+
+        const r = noBtn.getBoundingClientRect();
+        origW = r.width;
+        origH = r.height;
+
+        // плейсхолдер — чтобы «Да» не прыгала
         const ph = document.createElement('div');
         ph.className = 'btn-no-placeholder';
-        ph.style.width  = origW + 'px';
+        ph.style.width = origW + 'px';
         ph.style.height = origH + 'px';
-        tiles.appendChild(ph);
+        if (noBtn.parentNode) noBtn.parentNode.appendChild(ph);
 
-        noBtn.classList.add('runaway');
-        noBtn.style.left   = origLeft + 'px';
-        noBtn.style.top    = origTop  + 'px';
-        noBtn.style.width  = origW + 'px';
+        noBtn.classList.add('runaway-fixed');
+        noBtn.style.width = origW + 'px';
         noBtn.style.height = origH + 'px';
+        noBtn.style.left = r.left + 'px';
+        noBtn.style.top = r.top + 'px';
       }
 
       function currentScale() {
-        return Math.max(minScale, 1 - escapes * 0.08);
+        return Math.max(minScale, 1 - escapes * 0.1);
       }
       function currentText() {
         return escapeTexts[Math.min(escapes, escapeTexts.length - 1)];
@@ -1108,51 +1109,45 @@
         const el = document.createElement('div');
         el.className = 'teaser';
         el.textContent = txt;
-
-        const cRect = container.getBoundingClientRect();
-        const maxX = Math.max(10, cRect.width - 130);
-        const maxY = Math.max(20, cRect.height - 120);
-        el.style.left = (10 + Math.random() * maxX) + 'px';
-        el.style.top  = (10 + Math.random() * maxY) + 'px';
-
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        el.style.left = (20 + Math.random() * Math.max(10, vw - 160)) + 'px';
+        el.style.top  = (60 + Math.random() * Math.max(10, vh - 220)) + 'px';
         teaserLayer.appendChild(el);
         activeTeasers++;
         setTimeout(() => { el.remove(); activeTeasers--; }, 2200);
       }
 
-      function escapeFrom(px, py) {
+      function escapeFrom() {
         if (caught) return;
-        initAbsolute();
+        initFixed();
 
         const scale = currentScale();
-        const w = origW * scale;
-        const h = origH * scale;
-        const tRect = tiles.getBoundingClientRect();
-        const maxX = Math.max(padding, tRect.width  - w - padding);
-        const maxY = Math.max(padding, tRect.height - h - padding);
+        const visW = origW * scale;
+        const visH = origH * scale;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
 
-        let nx = padding, ny = padding;
-        let bestNx = nx, bestNy = ny, bestDist = -1;
-        let tries = 0;
+        // Центр видимой кнопки. Ограничиваем так, чтобы видимая кнопка не вылезала за края.
+        const minCx = padding + visW / 2;
+        const maxCx = vw - padding - visW / 2;
+        const minCy = padding + visH / 2;
+        const maxCy = vh - padding - visH / 2;
 
-        while (tries < 20) {
-          nx = padding + Math.random() * (maxX - padding);
-          ny = padding + Math.random() * (maxY - padding);
-          tries++;
-          const d = Math.hypot(
-            tRect.left + nx + w / 2 - px,
-            tRect.top  + ny + h / 2 - py
-          );
-          if (d > bestDist) { bestDist = d; bestNx = nx; bestNy = ny; }
-          if (d >= minDistance) break;
+        let cx = minCx, cy = minCy;
+        if (maxCx > minCx && maxCy > minCy) {
+          cx = minCx + Math.random() * (maxCx - minCx);
+          cy = minCy + Math.random() * (maxCy - minCy);
         }
-        if (bestDist < minDistance) { nx = bestNx; ny = bestNy; }
 
-        const tx = nx - origLeft;
-        const ty = ny - origTop;
-        noBtn.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+        const left = cx - origW / 2;
+        const top  = cy - origH / 2;
+
+        noBtn.style.left = left + 'px';
+        noBtn.style.top  = top  + 'px';
+        noBtn.style.transform = `scale(${scale})`;
+
         escapes++;
-        lastEscapeTime = performance.now();
         noBtn.textContent = currentText();
         haptic('light');
         spawnTeaser();
@@ -1161,28 +1156,24 @@
       function catchIt() {
         if (caught) return;
         caught = true;
-        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         removeListeners();
+        initFixed();
 
-        initAbsolute();
-
-        // Сохраняем текущий translate, добавляем scale + rotate для испарения
-        const prev = noBtn.style.transform || '';
-        // Убираем scale(...) из prev, чтобы не было двойного scale
-        const cleaned = prev.replace(/scale\([^)]*\)/, '').trim();
         noBtn.classList.add('evaporating');
         noBtn.style.opacity = '0';
-        noBtn.style.transform = (cleaned ? cleaned + ' ' : '') + 'scale(0.15) rotate(-14deg)';
+        const currentScaleStr = `scale(${currentScale()})`;
+        noBtn.style.transform = `${currentScaleStr} scale(0.15) rotate(-16deg)`;
 
         setTimeout(() => {
           noBtn.style.display = 'none';
-          const ph = tiles.querySelector('.btn-no-placeholder');
+          const ph = container.querySelector('.btn-no-placeholder');
           if (ph) ph.remove();
-          tiles.classList.add('yes-solo');
+          const tiles = container.querySelector('.choice-tiles');
+          if (tiles) tiles.classList.add('yes-solo');
           if (yesBtn) yesBtn.classList.add('pulse');
           teaserLayer.querySelectorAll('.teaser').forEach(el => el.remove());
           activeTeasers = 0;
-        }, 420);
+        }, 440);
 
         haptic('medium');
         toast('Поймала! 😏', 1400);
@@ -1192,57 +1183,33 @@
       function onPointerDown(e) {
         if (caught) return;
         if (e.button !== undefined && e.button !== 0) return;
-
         e.preventDefault();
         e.stopPropagation();
 
         const now = performance.now();
-        const recentlyEscaped = (now - lastEscapeTime) < ESCAPE_COOLDOWN;
+        const dt = now - lastDownTime;
+        lastDownTime = now;
 
-        // Быстрый повторный клик или все попытки исчерпаны — ловим
-        if (escapes >= maxEscapes || recentlyEscaped) {
-          catchIt();
-          return;
-        }
-        escapeFrom(e.clientX, e.clientY);
-      }
-
-      function onPointerMove(e) {
-        if (caught || escapes >= maxEscapes) return;
-        // Анти-баг: во время cooldown pointermove игнорируется полностью
-        if (performance.now() - lastEscapeTime < ESCAPE_COOLDOWN) return;
-
-        lastPX = e.clientX;
-        lastPY = e.clientY;
-        if (rafId) return;
-        rafId = requestAnimationFrame(() => {
-          rafId = null;
-          if (caught || escapes >= maxEscapes) return;
-          if (performance.now() - lastEscapeTime < ESCAPE_COOLDOWN) return;
-          const bRect = noBtn.getBoundingClientRect();
-          const cx = bRect.left + bRect.width / 2;
-          const cy = bRect.top  + bRect.height / 2;
-          if (Math.hypot(lastPX - cx, lastPY - cy) < 48) {
-            escapeFrom(lastPX, lastPY);
-          }
-        });
+        // Двойной быстрый клик — ловит
+        if (dt < 150) { catchIt(); return; }
+        // Исчерпаны попытки — тоже ловит
+        if (escapes >= maxEscapes) { catchIt(); return; }
+        // Иначе — убегает
+        escapeFrom();
       }
 
       function removeListeners() {
         noBtn.removeEventListener('pointerdown', onPointerDown);
-        container.removeEventListener('pointermove', onPointerMove);
       }
 
       if (reduceMotion) {
         noBtn.addEventListener('click', (e) => { e.preventDefault(); catchIt(); });
       } else {
         noBtn.addEventListener('pointerdown', onPointerDown, { passive: false });
-        container.addEventListener('pointermove', onPointerMove, { passive: true });
       }
 
       return function cleanup() {
         caught = true;
-        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         removeListeners();
         teaserLayer.remove();
       };
@@ -1273,7 +1240,7 @@
 
       const cleanupRunaway = makeRunaway(noBtn, modal, {
         escapeTexts: opts.escapeTexts || ['Нет', 'Точно?', 'Уверена?', 'Ну пожалуйста…', '🥺', '...'],
-        maxEscapes:  opts.maxEscapes  ?? 5,
+        maxEscapes:  opts.maxEscapes  ?? 4,
         onCaught:    opts.onCaught    || null
       });
 
@@ -1323,7 +1290,7 @@
 
       const cleanupRunaway = makeRunaway(noBtn, card, {
         escapeTexts: ['Нет', 'Точно нет?', 'Уверена?', 'Ну пожалуйста…', '🥺', '...'],
-        maxEscapes: 5
+        maxEscapes: 4
       });
 
       yesBtn.addEventListener('click', () => {
@@ -1468,21 +1435,11 @@
         });
       }
     }
+
+    // БАГФИКС: выход из квеста — прямой, без убегающей кнопки
     $('#questBack').addEventListener('click', () => {
-      showChoiceModal({
-        emo: '🥺',
-        txt: 'Уже уходишь?..',
-        yesText: 'Остаться',
-        noText: 'Уйти',
-        escapeTexts: ['Уйти', 'Точно уйти?', 'Ну ладно…', '🥺', '...'],
-        maxEscapes: 4,
-        dismissible: true,
-        onYes: () => {},
-        onClose: () => {
-          $('#questLayer').classList.add('hidden');
-          switchTab('home');
-        }
-      });
+      $('#questLayer').classList.add('hidden');
+      switchTab('home');
     });
 
     /* ============================================================
@@ -1733,7 +1690,7 @@
       card.addEventListener('click', () => { haptic('light'); openGame(card.dataset.game); });
     });
 
-    // БАГФИКС: из мини-игр убегающая кнопка убрана — прямой выход
+    // БАГФИКС: прямой выход из игры без модалки
     $('#gameBack').addEventListener('click', () => {
       closeGame();
       switchTab('games');
