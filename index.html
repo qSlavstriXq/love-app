@@ -1320,20 +1320,20 @@
         return 'дней';
       }
   function initCounters() {
-    const meet  = Math.max(0, daysBetween(CONST_DATE_MEET));
-    const start = Math.max(0, daysBetween(CONST_DATE_START));
+  const meet  = Math.max(0, daysBetween(CONST_DATE_MEET));
+  const start = Math.max(0, daysBetween(CONST_DATE_START));
 
-    $('#daysMeet').textContent = nf.format(meet);
-    $('#daysStart').textContent = nf.format(start);
-    $('#tlTogether').textContent = `вместе ${nf.format(start)} ${wordDays(start)}`;
+  $('#daysMeet').textContent = nf.format(meet);
+  $('#daysStart').textContent = nf.format(start);
+  $('#tlTogether').textContent = `вместе ${nf.format(start)} ${wordDays(start)}`;
 
-    const gap = Math.round(
-      (new Date(CONST_DATE_START + 'T00:00:00') - new Date(CONST_DATE_MEET + 'T00:00:00')) / 86400000
-    );
+  const meetDate = new Date(CONST_DATE_MEET + 'T00:00:00');
+  const startDate = new Date(CONST_DATE_START + 'T00:00:00');
+  const gap = Math.round((startDate - meetDate) / 86400000);
 
-    const gapEl = $('#tlGap1');
-    if (gapEl) gapEl.textContent = nf.format(gap) + ' ' + wordDays(gap) + ' до первого «да»';
-  }
+  const gapEl = $('#tlGap1');
+  if (gapEl) gapEl.textContent = gap + ' ' + wordDays(gap) + ' до первого «да»';
+}
 
       let timelineAnimating = false;
       function initTimeline() {
